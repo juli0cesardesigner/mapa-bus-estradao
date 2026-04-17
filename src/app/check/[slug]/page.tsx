@@ -19,6 +19,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
   const [view, setView] = React.useState<'list' | 'map'>('list');
+  const [selectedLocation, setSelectedLocation] = React.useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [editingPassenger, setEditingPassenger] = React.useState<any>(null);
   const dataLayer = useData();
