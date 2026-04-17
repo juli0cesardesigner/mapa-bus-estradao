@@ -117,6 +117,7 @@ export function useData() {
       } else {
         // Insert
         const { data: trip } = await supabase.from('viagens').select('id').eq('slug', slug).single();
+        if (!trip) throw new Error('Viagem não encontrada');
         const { error } = await supabase.from('passageiros').insert([{ ...passengerToSave, viagem_id: trip.id }]);
         if (error) throw error;
       }
