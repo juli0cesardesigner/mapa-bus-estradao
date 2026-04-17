@@ -333,7 +333,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                           >
                             <button
                               onClick={() => toggleBoarding(p.id, !p.embarcado)}
-                              className="flex flex-1 items-center gap-4 min-w-0"
+                              className="flex flex-1 items-center justify-start gap-4 min-w-0"
                             >
                               <div className="flex flex-col items-center gap-1.5 shrink-0">
                                 <div 
@@ -394,7 +394,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                           >
                             <button
                               onClick={() => toggleBoarding(p.id, !p.embarcado)}
-                              className="flex flex-1 items-center gap-4 min-w-0"
+                              className="flex flex-1 items-center justify-start gap-4 min-w-0"
                             >
                               <div className="flex flex-col items-center gap-1.5 shrink-0 opacity-50">
                                 <div 
