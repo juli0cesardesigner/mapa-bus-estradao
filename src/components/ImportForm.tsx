@@ -19,6 +19,24 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const droppedFile = e.dataTransfer.files[0];
+      if (droppedFile.name.endsWith('.csv')) {
+        setFile(droppedFile);
+      } else {
+        alert('Por favor, selecione apenas arquivos .csv');
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !title) return;
@@ -26,6 +44,10 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
     setIsUploading(true);
     try {
       const rawData = await parseCSV(file);
+      if (!rawData || rawData.length === 0) {
+        throw new Error('O arquivo CSV parece estar vazio ou no formato incorreto.');
+      }
+      
       const locations = rawData.map(p => p.localidade);
       const colors = generateLocationColors(locations);
 
@@ -38,9 +60,9 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
       await onImport(title, processedData);
       setTitle('');
       setFile(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao importar CSV:', error);
-      alert('Erro ao processar o arquivo CSV. Verifique o formato.');
+      alert(error.message || 'Erro ao processar o arquivo CSV. Verifique o formato.');
     } finally {
       setIsUploading(false);
     }
@@ -62,10 +84,14 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
 
       <div className="relative group">
         <label className="block text-sm font-medium text-zinc-400 mb-2">Lista de Passageiros (CSV)</label>
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-800 border-dashed rounded-2xl group-hover:border-zinc-700 transition-colors">
+        <div 
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-800 border-dashed rounded-2xl group-hover:border-zinc-700 transition-colors cursor-pointer"
+        >
           <div className="space-y-1 text-center">
             <Upload className="mx-auto h-12 w-12 text-zinc-500 group-hover:text-zinc-400 transition-colors" />
-            <div className="flex text-sm text-zinc-400">
+            <div className="flex text-sm text-zinc-400 justify-center">
               <label className="relative cursor-pointer rounded-md font-medium text-blue-500 hover:text-blue-400">
                 <span>Upload de arquivo</span>
                 <input type="file" className="sr-only" accept=".csv" onChange={handleFileChange} />

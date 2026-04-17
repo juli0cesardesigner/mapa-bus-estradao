@@ -64,14 +64,29 @@ export function useData() {
     });
 
     if (mode === 'supabase') {
-      const { data: trip } = await supabase
+      const { data: trip, error: tripError } = await supabase
         .from('viagens')
         .insert([{ id: tripId, slug, titulo: title }])
         .select()
         .single();
       
+      if (tripError) {
+        console.error('Erro ao criar viagem:', tripError);
+        throw tripError;
+      }
+
+      if (!trip) throw new Error('Falha ao obter dados da viagem criada');
+
       const passengersWithTrip = passengersWithColors.map(p => ({ ...p, viagem_id: trip.id }));
-      await supabase.from('passageiros').insert(passengersWithTrip);
+      const { error: passError } = await supabase.from('passageiros').insert(passengersWithTrip);
+      
+      if (passError) {
+        console.error('Erro ao inserir passageiros:', passError);
+        // Tentar limpar a viagem se os passageiros falharem
+        await supabase.from('viagens').delete().eq('id', trip.id);
+        throw passError;
+      }
+
       return trip;
     } else {
       const newTrip = {

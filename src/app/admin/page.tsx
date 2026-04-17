@@ -23,8 +23,13 @@ export default function AdminPage() {
   };
 
   const handleImport = async (title: string, passengers: any[]) => {
-    await dataLayer.createTrip(title, passengers);
-    fetchTrips();
+    try {
+      await dataLayer.createTrip(title, passengers);
+      fetchTrips();
+    } catch (error: any) {
+      console.error('Erro na importação:', error);
+      alert('Erro ao criar viagem. Verifique se o nome já existe ou se há problemas de conexão.');
+    }
   };
 
   const generateDemo = async () => {
