@@ -164,5 +164,26 @@ export function useData() {
     }
   };
 
-  return { mode, getTrips, createTrip, getBoardingData, updatePassenger, upsertPassenger, deletePassenger };
+  const deleteTrip = async (id: string, slug: string) => {
+    if (mode === 'supabase') {
+      const { error } = await supabase.from('viagens').delete().eq('id', id);
+      if (error) throw error;
+    } else {
+      const trips = JSON.parse(localStorage.getItem('demo_trips') || '[]');
+      const updatedTrips = trips.filter((t: any) => t.id !== id);
+      localStorage.setItem('demo_trips', JSON.stringify(updatedTrips));
+      localStorage.removeItem(`demo_passengers_${slug}`);
+    }
+  };
+
+  return { 
+    mode, 
+    getTrips, 
+    getBoardingData, 
+    updatePassenger, 
+    createTrip, 
+    upsertPassenger, 
+    deletePassenger,
+    deleteTrip
+  };
 }

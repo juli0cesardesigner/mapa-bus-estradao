@@ -4,7 +4,7 @@ import React from 'react';
 import { useData } from '@/hooks/useData';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { BusMap } from '@/components/BusMap';
-import { Map as MapIcon, List, Users, CheckCircle2, Info } from 'lucide-react';
+import { Armchair as SeatIcon, List, Users, CheckCircle2, Info } from 'lucide-react';
 import { generateLocationColors } from '@/utils/csv-parser';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -73,7 +73,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
       await dataLayer.upsertPassenger(params.slug, formData);
       setIsEditModalOpen(false);
       setEditingPassenger(null);
-      if (!isSupabaseConfigured) fetchData(); // Fallback para demo mode sem realtime
+      if (!isSupabaseConfigured) fetchData();
     } catch (error) {
       console.error('Erro ao salvar passageiro:', error);
       alert('Erro ao salvar passageiro. Verifique os dados.');
@@ -86,7 +86,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
         await dataLayer.deletePassenger(params.slug, id);
         setIsEditModalOpen(false);
         setEditingPassenger(null);
-        if (!isSupabaseConfigured) fetchData(); // Fallback para demo mode sem realtime
+        if (!isSupabaseConfigured) fetchData();
       } catch (error) {
         console.error('Erro ao excluir:', error);
       }
@@ -231,8 +231,8 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
-            <MapIcon className="w-5 h-5" />
-            MAPA
+            <SeatIcon className="w-5 h-5" />
+            ASSENTOS
           </button>
         </div>
 
@@ -324,7 +324,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                         <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Aguardando Embarque</p>
                       </div>
                       {waiting.map(p => {
-                        const color = locationColors[p.localidade] || '#3B82F6';
+                        const color = locationColors[(p.localidade || 'GERAL').toUpperCase().trim()] || '#3B82F6';
                         const floor = getFloorLabel(p.assento);
                         return (
                           <div
@@ -385,7 +385,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                         <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Embarcados</p>
                       </div>
                       {boarded.map(p => {
-                        const color = locationColors[p.localidade] || '#3B82F6';
+                        const color = locationColors[(p.localidade || 'GERAL').toUpperCase().trim()] || '#3B82F6';
                         const floor = getFloorLabel(p.assento);
                         return (
                           <div

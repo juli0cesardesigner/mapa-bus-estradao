@@ -4,7 +4,7 @@ import React from 'react';
 import { useData } from '@/hooks/useData';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { ImportForm } from '@/components/ImportForm';
-import { ClipboardCopy, ExternalLink, Info } from 'lucide-react';
+import { ClipboardCopy, ExternalLink, Info, Trash2 } from 'lucide-react';
 
 export default function AdminPage() {
   const [trips, setTrips] = React.useState<any[]>([]);
@@ -90,9 +90,20 @@ export default function AdminPage() {
   };
 
   const copyLink = (slug: string) => {
-    const link = `${window.location.origin}/check/${slug}`;
+    const link = `${window.location.origin}/${slug}`;
     navigator.clipboard.writeText(link);
     alert('Link copiado para a área de transferência!');
+  };
+
+  const handleDeleteTrip = async (id: string, slug: string) => {
+    if (confirm('ATENÇÃO: Isso excluirá permanentEMENTE esta viagem e todos os dados de passageiros. Continuar?')) {
+      try {
+        await dataLayer.deleteTrip(id, slug);
+        fetchTrips();
+      } catch (error) {
+        console.error('Erro ao excluir viagem:', error);
+      }
+    }
   };
 
   return (
@@ -150,8 +161,17 @@ export default function AdminPage() {
                       <h3 className="font-bold text-lg group-hover:text-blue-400 transition-colors">{trip.titulo}</h3>
                       <p className="text-xs text-zinc-500">{new Date(trip.created_at).toLocaleDateString('pt-BR')}</p>
                     </div>
-                    <div className="bg-zinc-950 px-3 py-1 rounded-full border border-zinc-800 text-[10px] font-bold text-zinc-400">
-                      {trip.passageiros[0].count} PASSAGEIROS
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => handleDeleteTrip(trip.id, trip.slug)}
+                        className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                        title="Excluir Viagem"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <div className="bg-zinc-950 px-3 py-1 rounded-full border border-zinc-800 text-[10px] font-bold text-zinc-400">
+                        {trip.passageiros[0].count} PASSAGEIROS
+                      </div>
                     </div>
                   </div>
 
@@ -164,7 +184,7 @@ export default function AdminPage() {
                       COPIAR LINK
                     </button>
                     <a
-                      href={`/check/${trip.slug}`}
+                      href={`/${trip.slug}`}
                       target="_blank"
                       className="flex-1 bg-blue-600 rounded-xl px-3 py-2 text-xs font-bold hover:bg-blue-500 flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]"
                     >
