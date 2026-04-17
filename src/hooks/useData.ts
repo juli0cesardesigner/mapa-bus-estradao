@@ -99,5 +99,49 @@ export function useData() {
     }
   };
 
-  return { mode, getTrips, createTrip, getBoardingData, updatePassenger };
+  const upsertPassenger = async (slug: string, passenger: any) => {
+    // Garantir cor se for um novo local
+    let passengerToSave = { ...passenger };
+    if (!passenger.cor_hex) {
+      const { passengers } = await getBoardingData(slug);
+      const locations = Array.from(new Set([...passengers.map(p => p.localidade), passenger.localidade]));
+      const colors = generateLocationColors(locations);
+      passengerToSave.cor_hex = colors[passenger.localidade] || '#3B82F6';
+    }
+
+    if (mode === 'supabase') {
+      if (passenger.id) {
+        // Update
+        const { error } = await supabase.from('passageiros').update(passengerToSave).eq('id', passenger.id);
+        if (error) throw error;
+      } else {
+        // Insert
+        const { data: trip } = await supabase.from('viagens').select('id').eq('slug', slug).single();
+        const { error } = await supabase.from('passageiros').insert([{ ...passengerToSave, viagem_id: trip.id }]);
+        if (error) throw error;
+      }
+    } else {
+      const passengers = JSON.parse(localStorage.getItem(`demo_passengers_${slug}`) || '[]');
+      let updated;
+      if (passenger.id) {
+        updated = passengers.map((p: any) => p.id === passenger.id ? { ...p, ...passengerToSave } : p);
+      } else {
+        updated = [...passengers, { ...passengerToSave, id: crypto.randomUUID(), embarcado: false }];
+      }
+      localStorage.setItem(`demo_passengers_${slug}`, JSON.stringify(updated));
+    }
+  };
+
+  const deletePassenger = async (slug: string, id: string) => {
+    if (mode === 'supabase') {
+      const { error } = await supabase.from('passageiros').delete().eq('id', id);
+      if (error) throw error;
+    } else {
+      const passengers = JSON.parse(localStorage.getItem(`demo_passengers_${slug}`) || '[]');
+      const filtered = passengers.filter((p: any) => p.id !== id);
+      localStorage.setItem(`demo_passengers_${slug}`, JSON.stringify(filtered));
+    }
+  };
+
+  return { mode, getTrips, createTrip, getBoardingData, updatePassenger, upsertPassenger, deletePassenger };
 }
