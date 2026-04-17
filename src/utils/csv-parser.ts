@@ -13,9 +13,9 @@ export const parseCSV = (file: File): Promise<PassengerData[]> => {
       skipEmptyLines: true,
       complete: (results) => {
         const data = results.data.map((row: any) => ({
-          nome: row.nome || row.Nome || '',
+          nome: (row.nome || row.Nome || '').toUpperCase().trim(),
           assento: parseInt(row.assento || row.Assento || '0'),
-          localidade: row.localidade || row.Localidade || 'Geral',
+          localidade: (row.localidade || row.Localidade || 'GERAL').toUpperCase().trim(),
         }));
         resolve(data);
       },

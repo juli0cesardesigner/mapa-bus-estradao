@@ -94,22 +94,21 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
   };
 
   const locationColors = React.useMemo(() => {
-    const locations = Array.from(new Set(passengers.map(p => p.localidade || 'Geral')));
+    const locations = Array.from(new Set(passengers.map(p => (p.localidade || 'Geral').toUpperCase().trim())));
     const generatedColors = generateLocationColors(locations);
     
     const colors: Record<string, string> = {};
     locations.forEach(loc => {
-      // Tentar pegar a cor do primeiro passageiro dessa localidade, se tiver
-      const existingColor = passengers.find(p => p.localidade === loc)?.cor_hex;
+      const existingColor = passengers.find(p => (p.localidade || 'Geral').toUpperCase().trim() === loc)?.cor_hex;
       colors[loc] = existingColor || generatedColors[loc] || '#3B82F6';
     });
     return colors;
   }, [passengers]);
 
-  const locations = Array.from(new Set(passengers.map(p => p.localidade)));
+  const locations = Array.from(new Set(passengers.map(p => (p.localidade || 'Geral').toUpperCase().trim())));
   
   const filteredPassengers = passengers.filter(p => {
-    return !selectedLocation || p.localidade === selectedLocation;
+    return !selectedLocation || (p.localidade || 'Geral').toUpperCase().trim() === selectedLocation;
   });
 
   const boardedCount = passengers.filter(p => p.embarcado).length;

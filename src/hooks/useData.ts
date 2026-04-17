@@ -101,12 +101,17 @@ export function useData() {
 
   const upsertPassenger = async (slug: string, passenger: any) => {
     // Garantir cor se for um novo local
-    let passengerToSave = { ...passenger };
+    let passengerToSave = { 
+      ...passenger,
+      nome: passenger.nome.toUpperCase().trim(),
+      localidade: passenger.localidade.toUpperCase().trim()
+    };
+    
     if (!passenger.cor_hex) {
       const { passengers } = await getBoardingData(slug);
-      const locations = Array.from(new Set([...passengers.map((p: any) => p.localidade), passenger.localidade]));
+      const locations = Array.from(new Set([...passengers.map((p: any) => (p.localidade || '').toUpperCase().trim()), passengerToSave.localidade]));
       const colors = generateLocationColors(locations);
-      passengerToSave.cor_hex = colors[passenger.localidade] || '#3B82F6';
+      passengerToSave.cor_hex = colors[passengerToSave.localidade] || '#3B82F6';
     }
 
     if (mode === 'supabase') {
