@@ -333,7 +333,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                           >
                             <button
                               onClick={() => toggleBoarding(p.id, !p.embarcado)}
-                              className="flex flex-1 items-center justify-start gap-4 min-w-0"
+                              className="flex items-center gap-4 flex-1 text-left"
                             >
                               <div className="flex flex-col items-center gap-1.5 shrink-0">
                                 <div 
@@ -350,8 +350,8 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                                 </span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-black text-base truncate text-white uppercase">{p.nome}</p>
-                                <div className="flex items-center gap-1.5 mt-0.5">
+                                <p className="font-black text-base truncate text-white uppercase block leading-tight">{p.nome}</p>
+                                <div className="flex items-center gap-1.5 mt-1">
                                   <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
                                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{p.localidade}</p>
                                 </div>
@@ -363,12 +363,12 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                                 setEditingPassenger(p);
                                 setIsEditModalOpen(true);
                               }}
-                              className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition-colors z-10"
+                              className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition-colors shrink-0"
                             >
                               <List className="w-4 h-4 text-zinc-400" />
                             </button>
                             
-                            <div className="w-6 h-6 rounded-full border-2 border-zinc-800 flex items-center justify-center shrink-0 ml-2">
+                            <div className="w-6 h-6 rounded-full border-2 border-zinc-800 flex items-center justify-center shrink-0">
                               <div className="w-1 h-1 rounded-full bg-zinc-700" />
                             </div>
                           </div>
@@ -394,7 +394,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                           >
                             <button
                               onClick={() => toggleBoarding(p.id, !p.embarcado)}
-                              className="flex flex-1 items-center justify-start gap-4 min-w-0"
+                              className="flex items-center gap-4 flex-1 text-left"
                             >
                               <div className="flex flex-col items-center gap-1.5 shrink-0 opacity-50">
                                 <div 
@@ -407,8 +407,8 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                                 </span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-black text-base truncate text-zinc-500 uppercase">{p.nome}</p>
-                                <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">{p.localidade}</p>
+                                <p className="font-black text-base truncate text-zinc-500 uppercase block leading-tight">{p.nome}</p>
+                                <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider mt-1">{p.localidade}</p>
                               </div>
                             </button>
 
@@ -417,7 +417,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                                 setEditingPassenger(p);
                                 setIsEditModalOpen(true);
                               }}
-                              className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:bg-zinc-800 transition-colors z-10"
+                              className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:bg-zinc-800 transition-colors shrink-0"
                             >
                               <List className="w-4 h-4 text-zinc-600" />
                             </button>
