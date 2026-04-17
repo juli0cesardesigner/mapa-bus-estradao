@@ -104,7 +104,7 @@ export function useData() {
     let passengerToSave = { ...passenger };
     if (!passenger.cor_hex) {
       const { passengers } = await getBoardingData(slug);
-      const locations = Array.from(new Set([...passengers.map(p => p.localidade), passenger.localidade]));
+      const locations = Array.from(new Set([...passengers.map((p: any) => p.localidade), passenger.localidade]));
       const colors = generateLocationColors(locations);
       passengerToSave.cor_hex = colors[passenger.localidade] || '#3B82F6';
     }
