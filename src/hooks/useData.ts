@@ -44,8 +44,7 @@ export function useData() {
         .replace(/^-+|-+$/g, '');
     };
 
-    const baseSlug = slugify(title);
-    const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
+    const slug = slugify(title);
     
     // Encontrar todas as localidades únicas
     const uniqueLocations = Array.from(new Set(passengers.map(p => p.localidade || 'Geral')));
