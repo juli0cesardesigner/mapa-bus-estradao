@@ -24,18 +24,32 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
   const [editingPassenger, setEditingPassenger] = React.useState<any>(null);
   const dataLayer = useData();
 
-  React.useEffect(() => {
-    fetchData();
+  const fetchData = async () => {
+    setIsLoading(true);
+    const { trip: tripData, passengers: passengersData } = await dataLayer.getBoardingData(params.slug);
+    setTrip(tripData);
+    setPassengers(passengersData);
+    setIsLoading(false);
 
-    if (isSupabaseConfigured) {
+    // Subscrever apenas após ter o ID da viagem
+    if (isSupabaseConfigured && tripData?.id) {
       const channel = supabase
         .channel(`boarding-${params.slug}`)
         .on(
           'postgres_changes',
-          { event: '*', schema: 'public', table: 'passageiros' },
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'passageiros',
+            filter: `viagem_id=eq.${tripData.id}` 
+          },
           (payload) => {
             if (payload.eventType === 'INSERT') {
-              setPassengers((current) => [...current, payload.new].sort((a, b) => a.assento - b.assento));
+              setPassengers((current) => {
+                const exists = current.find(p => p.id === payload.new.id);
+                if (exists) return current;
+                return [...current, payload.new].sort((a, b) => a.assento - b.assento);
+              });
             } else if (payload.eventType === 'UPDATE') {
               setPassengers((current) => 
                 current.map((p) => (p.id === payload.new.id ? { ...p, ...payload.new } : p))
@@ -51,15 +65,11 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
         supabase.removeChannel(channel);
       };
     }
-  }, [params.slug, dataLayer.mode]);
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    const { trip, passengers } = await dataLayer.getBoardingData(params.slug);
-    setTrip(trip);
-    setPassengers(passengers);
-    setIsLoading(false);
   };
+
+  React.useEffect(() => {
+    fetchData();
+  }, [params.slug, dataLayer.mode]);
 
   const toggleBoarding = async (id: string, status: boolean) => {
     setPassengers(current => 
@@ -305,7 +315,8 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
               };
 
               const splitName = (fullName: string) => {
-                const parts = fullName.trim().split(/\s+/);
+                const safeName = fullName || '';
+                const parts = safeName.trim().split(/\s+/);
                 const firstName = parts[0] || '';
                 const rest = parts.slice(1).join(' ') || '';
                 return { firstName, rest };
