@@ -1,7 +1,7 @@
 -- Tabela de Viagens
 CREATE TABLE viagens (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  slug UUID DEFAULT uuid_generate_v4() UNIQUE,
+  slug TEXT UNIQUE,
   titulo TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   admin_id UUID REFERENCES auth.users(id)

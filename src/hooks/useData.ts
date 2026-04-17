@@ -30,7 +30,22 @@ export function useData() {
 
   const createTrip = async (title: string, passengers: any[]) => {
     const tripId = crypto.randomUUID();
-    const slug = crypto.randomUUID();
+    
+    // Função para gerar slug amigável
+    const slugify = (text: string) => {
+      return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .normalize('NFD') // Remove acentos
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    };
+
+    const baseSlug = slugify(title);
+    const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
     
     // Encontrar todas as localidades únicas
     const uniqueLocations = Array.from(new Set(passengers.map(p => p.localidade || 'Geral')));
