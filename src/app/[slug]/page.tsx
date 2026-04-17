@@ -304,6 +304,13 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                 return { label: 'PISO SUP', color: 'bg-zinc-800 text-zinc-400' };
               };
 
+              const splitName = (fullName: string) => {
+                const parts = fullName.trim().split(/\s+/);
+                const firstName = parts[0] || '';
+                const rest = parts.slice(1).join(' ') || '';
+                return { firstName, rest };
+              };
+
               const sortFn = (a: any, b: any) => {
                 if (selectedLocation) {
                   return a.nome.localeCompare(b.nome);
@@ -326,50 +333,53 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                       {waiting.map(p => {
                         const color = locationColors[(p.localidade || 'GERAL').toUpperCase().trim()] || '#3B82F6';
                         const floor = getFloorLabel(p.assento);
+                        const { firstName, rest } = splitName(p.nome);
                         return (
                           <div
                             key={p.id}
-                            className="w-full flex items-center gap-4 p-4 rounded-2xl border bg-[#1A1A1A] border-zinc-800 shadow-2xl transition-all text-left group relative overflow-hidden"
+                            className="w-full flex items-center gap-3 p-3 rounded-2xl border bg-[#1A1A1A] border-zinc-800 shadow-2xl transition-all group relative overflow-hidden"
                           >
-                            <button
-                              onClick={() => toggleBoarding(p.id, !p.embarcado)}
-                              className="flex items-center gap-4 flex-1 text-left"
-                            >
-                              <div className="flex flex-col items-center gap-1.5 shrink-0">
-                                <div 
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg text-white transition-transform group-hover:scale-110"
-                                  style={{ 
-                                    backgroundColor: color,
-                                    boxShadow: `0 0 15px ${color}33`,
-                                  }}
-                                >
-                                  {p.assento}
-                                </div>
-                                <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
-                                  {floor.label}
-                                </span>
+                            <div className="flex flex-col items-center gap-1.5 shrink-0">
+                              <div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg text-white transition-transform group-hover:scale-110"
+                                style={{ 
+                                  backgroundColor: color,
+                                  boxShadow: `0 0 15px ${color}33`,
+                                }}
+                              >
+                                {p.assento}
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-black text-base truncate text-white uppercase block leading-tight">{p.nome}</p>
-                                <div className="flex items-center gap-1.5 mt-1">
-                                  <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-                                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">{p.localidade}</p>
-                                </div>
+                              <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
+                                {floor.label}
+                              </span>
+                            </div>
+
+                            <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
+                              <p className="font-black text-lg text-white uppercase leading-none truncate">{firstName}</p>
+                              <p className="font-bold text-[10px] text-zinc-400 uppercase truncate mt-1 leading-tight">{rest || ' '}</p>
+                              <div className="flex items-center gap-1.5 mt-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+                                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest truncate">{p.localidade}</p>
                               </div>
-                            </button>
+                            </div>
                             
-                            <button 
-                              onClick={() => {
-                                setEditingPassenger(p);
-                                setIsEditModalOpen(true);
-                              }}
-                              className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition-colors shrink-0"
-                            >
-                              <List className="w-4 h-4 text-zinc-400" />
-                            </button>
-                            
-                            <div className="w-6 h-6 rounded-full border-2 border-zinc-800 flex items-center justify-center shrink-0">
-                              <div className="w-1 h-1 rounded-full bg-zinc-700" />
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button 
+                                onClick={() => {
+                                  setEditingPassenger(p);
+                                  setIsEditModalOpen(true);
+                                }}
+                                className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition-colors"
+                              >
+                                <List className="w-4 h-4 text-zinc-400" />
+                              </button>
+
+                              <button
+                                onClick={() => toggleBoarding(p.id, true)}
+                                className="h-10 px-4 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-blue-600 hover:border-blue-500 transition-all active:scale-95 group/btn"
+                              >
+                                <span className="text-[11px] font-black text-zinc-400 group-hover/btn:text-white uppercase tracking-tighter">OK</span>
+                              </button>
                             </div>
                           </div>
                         );
@@ -387,46 +397,47 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                       {boarded.map(p => {
                         const color = locationColors[(p.localidade || 'GERAL').toUpperCase().trim()] || '#3B82F6';
                         const floor = getFloorLabel(p.assento);
+                        const { firstName, rest } = splitName(p.nome);
                         return (
                           <div
                             key={p.id}
-                            className="w-full flex items-center gap-4 p-4 rounded-2xl border bg-zinc-900/40 border-zinc-800/50 transition-all text-left group"
+                            className="w-full flex items-center gap-3 p-3 rounded-2xl border bg-blue-600/5 border-blue-500/20 transition-all group"
                           >
-                            <button
-                              onClick={() => toggleBoarding(p.id, !p.embarcado)}
-                              className="flex items-center gap-4 flex-1 text-left"
-                            >
-                              <div className="flex flex-col items-center gap-1.5 shrink-0 opacity-50">
-                                <div 
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg text-zinc-500 bg-zinc-800/50"
-                                >
-                                  {p.assento}
-                                </div>
-                                <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
-                                  {floor.label}
-                                </span>
+                            <div className="flex flex-col items-center gap-1.5 shrink-0 opacity-40">
+                              <div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg text-zinc-500 bg-zinc-800/50"
+                              >
+                                {p.assento}
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-black text-base truncate text-zinc-500 uppercase block leading-tight">{p.nome}</p>
-                                <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider mt-1">{p.localidade}</p>
-                              </div>
-                            </button>
+                              <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
+                                {floor.label}
+                              </span>
+                            </div>
 
-                            <button 
-                              onClick={() => {
-                                setEditingPassenger(p);
-                                setIsEditModalOpen(true);
-                              }}
-                              className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:bg-zinc-800 transition-colors shrink-0"
-                            >
-                              <List className="w-4 h-4 text-zinc-600" />
-                            </button>
+                            <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
+                              <p className="font-black text-lg text-zinc-300 uppercase leading-none truncate">{firstName}</p>
+                              <p className="font-bold text-[10px] text-zinc-600 uppercase truncate mt-1 leading-tight">{rest || ' '}</p>
+                              <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-widest truncate mt-1.5">{p.localidade}</p>
+                            </div>
 
-                            <div className="flex flex-col items-end shrink-0 gap-1 ml-2">
-                              <span className="text-[8px] font-black text-blue-500 uppercase tracking-tight">CONFIRMADO</span>
-                              <div className="bg-blue-600/20 p-1 rounded-full">
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button 
+                                onClick={() => {
+                                  setEditingPassenger(p);
+                                  setIsEditModalOpen(true);
+                                }}
+                                className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:bg-zinc-800 transition-colors text-zinc-700"
+                              >
+                                <List className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                onClick={() => toggleBoarding(p.id, false)}
+                                className="h-10 px-4 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center group/btn"
+                                title="Desmarcar embarque"
+                              >
                                 <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                              </div>
+                              </button>
                             </div>
                           </div>
                         );
