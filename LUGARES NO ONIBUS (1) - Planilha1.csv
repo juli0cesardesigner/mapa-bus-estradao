@@ -1,57 +1,57 @@
-nome,assento,localidade
-Hillery Garcia de Oliveira,51,COLATINA
-Rennan Rodrigues Strelow,52,COLATINA
-Julio Cesar Pinto,53,COLATINA
-Hellen Ferreira,54,COLATINA
-Maxlon Araujo,55,SÃO MATEUS
-Alice de Araujo,56,SÃO MATEUS
-Paulo Lanes,57,SÃO MATEUS
-Filipe Gaspar,58,SÃO MATEUS
-Igor Del Orto,59,COLATINA
-Franciela Baggio,60,SÃO MATEUS
-Rodrigo de Souza,61,COLATINA
-Diego Martineli,62,COLATINA
-Danieli Imberti,1,LINHARES
-Luciene Rodrigues da Penha,2,LINHARES
-Neucy Tavares da Silva,3,SÃO MATEUS
-Josiane laquine,4,SÃO MATEUS
-Mariane Severo Estevão,5,SÃO MATEUS
-Evilly Lara Perini Lacerda,6,SÃO MATEUS
-Maria Helena Barbosa Esteves,7,SÃO MATEUS
-Luana Esteves de Almeida,8,SÃO MATEUS
-Larissa Vitoraci,9,SÃO MATEUS
-Gabriel Yuri Silva Hakozaki,10,SÃO MATEUS
-Pollyana Quartezani D'Amorim,11,SÃO MATEUS
-Mariane Severo Estevão,12,SÃO MATEUS
-Giulia de Oliveira Pinheiro Bezerra,13,SÃO MATEUS
-Robson de Souza Bezerra,14,SÃO MATEUS
-Gabriel Yuri Silva Hakozaki,15,SÃO MATEUS
-Larissa Vitoraci,16,SÃO MATEUS
-Helena White Alves de Oliveira,17,LINHARES
-Patrini Reis de Oliveira,18,LINHARES
-Ramony Loureiro de Queiroz,19,LINHARES
-Daniel Himenes Manzoli,20,LINHARES
-Rafael Coimbra Moraes,21,LINHARES
-Yasmin Teixeira Rocha,22,LINHARES
-Amanda Alcantara Herzog,23,LINHARES
-Michelly Pfeifer de Oliveira Machado,24,LINHARES
-CRISLAINE BORCHARDT PEREIRA,25,COLATINA
-Isabel Borchardt Pereira,26,COLATINA
-Katia Ferreira Silva,27,COLATINA
-Marcia dos Santos de Abreu,28,VENDA NOVA DO IMIGRANTE
-Cleidiane Fernandes Martins,29,COLATINA
-Jenifer Coutinho Salvador,30,COLATINA
-Gabriel Juliao De Oliveira,31,COLATINA
-Bianca Forechi Ribeiro,32,COLATINA
-Leticia Abreu da Fonseca,33,COLATINA
-Bernardo da Silva Caldonho,34,COLATINA
-Thamirys Jhenifer Gonçalves Barbosa,35,COLATINA
-Thaina Wencionek Felicissimo,36,COLATINA
-Leandro Belatto,37,COLATINA
-José Lucas Lima,38,COLATINA
-Andrea Alves de Souza,39,VITORIA
-João Marcos Souza Hemerly,40,VITORIA
-Maria Eudaci Firmino Maia,41,VITORIA
-Andrea de Freitas Ferreira,42,VITORIA
-Fabricio Assi da Silva,43,VITORIA
-Raul Silva de Almeida,44,VITORIA
+assento,nome,localidade
+1,Danieli Imberti ,LINHARES
+2,Luciene Rodrigues da Penha,LINHARES
+3,Neucy Tavares da Silva,SÃO MATEUS
+4,Josiane laquine ,SÃO MATEUS
+5,Mariane Severo Estevão,SÃO MATEUS
+6,Evilly Lara Perini Lacerda,SÃO MATEUS
+7,Maria Helena Barbosa Esteves,SÃO MATEUS
+8,Luana Esteves de Almeida,SÃO MATEUS
+9,Larissa Vitoraci,SÃO MATEUS
+10,Gabriel Yuri Silva Hakozaki,SÃO MATEUS
+11,"Pollyana Quartezani D,Amorim",SÃO MATEUS
+12,Mariane Severo Estevão,SÃO MATEUS
+13,Giulia de Oliveira Pinheiro Bezerra,SÃO MATEUS
+14,Robson de Souza Bezerra,SÃO MATEUS
+15,Gabriel Yuri Silva Hakozaki,SÃO MATEUS
+16,Larissa Vitoraci,SÃO MATEUS
+17,Helena White Alves de Oliveira ,LINHARES
+18,Patrini Reis de Oliveira,LINHARES
+19,Ramony Loureiro de Queiroz,LINHARES
+20,Daniel Himenes Manzoli,LINHARES
+21,Rafael Coimbra Moraes,LINHARES
+22,Yasmin Teixeira Rocha,LINHARES
+23,Amanda Alcantara Herzog,LINHARES
+24,Michelly Pfeifer de Oliveira Machado,LINHARES
+25,CRISLAINE BORCHARDT PEREIRA,COLATINA
+26, Isabel Borchardt Pereira,COLATINA
+27,Katia  Ferreira Silva,COLATINA
+28,Marcia dos Santos de Abreu,VENDA NOVA DO IMIGRANTE
+29,Cleidiane Fernandes Martins,COLATINA
+30,Jenifer Coutinho Salvador,COLATINA
+31,Gabriel Juliao De Oliveira,COLATINA
+32,Bianca Forechi Ribeiro,COLATINA
+33,Leticia Abreu da Fonseca,COLATINA
+34,Bernardo da Silva Caldonho,COLATINA
+35,Thamirys Jhenifer Gonçalves Barbosa,COLATINA
+36,Thaina Wencionek Felicissimo ,COLATINA
+37,Leandro Belatto,COLATINA
+38,José Lucas Lima,COLATINA
+39,Andrea Alves de Souza,VITORIA
+40,João Marcos Souza Hemerly,VITORIA
+41,Maria Eudaci Firmino Maia,VITORIA
+42,Andrea de Freitas Ferreira,VITORIA
+43,Fabricio Assi da Silva,VITORIA
+44,Raul Silva de Almeida ,VITORIA
+51,Hillery Garcia de Oliveira,Colatina
+52,Rennan Rodrigues Strelow,Colatina
+53,Julio Cesar Pinto,Colatina
+54,Hellen Ferreira,Colatina
+55,Maxlon Araujo,São Mateus
+56,Alice de Araujo,São Mateus
+57,Paulo Lanes,São Mateus
+58,Filipe Gaspar,São Mateus
+59,Igor Del Orto,Colatina
+60,Franciela Baggio,São Mateus
+61,Rodrigo de Souza,Colatina
+62,Diego Martineli,Colatina
