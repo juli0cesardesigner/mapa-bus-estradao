@@ -5,7 +5,7 @@ import { useData } from '@/hooks/useData';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { SeatPicker } from '@/components/SeatPicker';
 import { maskPhone, maskCPF, validateCPF } from '@/utils/masks';
-import { Armchair, MapPin, User, Phone, IdCard, CheckCircle, AlertTriangle, ArrowRight, Loader2 } from 'lucide-react';
+import { Armchair, MapPin, User, Phone, CreditCard, CheckCircle, AlertTriangle, ArrowRight, Loader2 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -224,7 +224,7 @@ export default function ReservarPage({ params }: { params: { slug: string } }) {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-zinc-500 ml-1">
-                    <IdCard className="w-3 h-3" />
+                    <CreditCard className="w-3 h-3" />
                     <label className="text-[10px] font-black uppercase tracking-widest">CPF</label>
                   </div>
                   <input 
