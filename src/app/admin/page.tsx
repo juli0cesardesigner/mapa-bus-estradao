@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useData } from '@/hooks/useData';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { ImportForm } from '@/components/ImportForm';
