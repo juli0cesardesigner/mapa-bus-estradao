@@ -117,16 +117,16 @@ export function SeatPicker({ occupiedSeats, selectedSeat, onSelect, capacity = 4
 
       {/* Legenda */}
       <div className="mt-8 flex gap-6 text-[9px] font-black uppercase tracking-widest">
-        <div className="flex items-center gap-2 text-zinc-600">
-          <div className="w-3 h-3 rounded-md bg-zinc-900 border border-zinc-800" />
+        <div className="flex items-center gap-2 text-emerald-500">
+          <div className="w-3 h-3 rounded-md bg-emerald-600" />
           Livre
         </div>
-        <div className="flex items-center gap-2 text-blue-500">
-          <div className="w-3 h-3 rounded-md bg-blue-600" />
+        <div className="flex items-center gap-2 text-yellow-500">
+          <div className="w-3 h-3 rounded-md bg-yellow-500" />
           Selecionado
         </div>
-        <div className="flex items-center gap-2 text-zinc-800">
-          <div className="w-3 h-3 rounded-md bg-zinc-800" />
+        <div className="flex items-center gap-2 text-red-500">
+          <div className="w-3 h-3 rounded-md bg-red-600" />
           Ocupado
         </div>
       </div>
@@ -142,15 +142,15 @@ function Seat({ num, isOccupied, isSelected, onClick }: { num: number; isOccupie
       className={cn(
         "w-full max-w-[60px] h-14 rounded-xl flex flex-col items-center justify-center transition-all relative group border-2",
         isOccupied 
-          ? "bg-zinc-900/50 border-zinc-900 text-zinc-800 cursor-not-allowed" 
+          ? "bg-red-950/30 border-red-900/50 text-red-500/50 cursor-not-allowed" 
           : isSelected
-            ? "bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] scale-110 z-10"
-            : "bg-[#111111] border-zinc-800 text-zinc-500 hover:border-zinc-700 active:scale-95"
+            ? "bg-yellow-500 border-yellow-300 text-black shadow-[0_0_20px_rgba(234,179,8,0.4)] scale-110 z-10"
+            : "bg-emerald-950/20 border-emerald-900/30 text-emerald-500/70 hover:border-emerald-500 hover:bg-emerald-900/20 active:scale-95"
       )}
     >
       <span className="text-xs font-black">{num}</span>
-      {isSelected && <Check className="w-3 h-3 absolute -top-1 -right-1 bg-white text-blue-600 rounded-full p-0.5" />}
-      {isOccupied && <User className="w-3 h-3 mt-1 opacity-20" />}
+      {isSelected && <Check className="w-3 h-3 absolute -top-1 -right-1 bg-black text-yellow-500 rounded-full p-0.5 border border-yellow-500" />}
+      {isOccupied && <User className="w-3 h-3 mt-1 opacity-40" />}
     </button>
   );
 }

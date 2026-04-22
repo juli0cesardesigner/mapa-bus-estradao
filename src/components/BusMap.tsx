@@ -146,9 +146,9 @@ export function BusMap({ passengers, locationColors, onToggleBoarding }: BusMapP
 
       {/* Legenda Atualizada */}
       <div className="mt-8 flex flex-wrap justify-center gap-6 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-md bg-zinc-900 border border-zinc-800" />
-          Vazio
+        <div className="flex items-center gap-2 text-emerald-500">
+          <div className="w-3 h-3 rounded-md bg-emerald-600" />
+          Livre
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-md bg-zinc-700" />
@@ -166,7 +166,7 @@ export function BusMap({ passengers, locationColors, onToggleBoarding }: BusMapP
 function Seat({ num, passenger, color, onClick }: { num: number; passenger?: any; color?: string; onClick: () => void }) {
   if (!passenger) {
     return (
-      <div className="w-full max-w-[80px] h-16 bg-[#0A0A0A] border border-zinc-900 rounded-xl flex flex-col items-center justify-center text-[10px] text-zinc-800 font-bold transition-all opacity-40">
+      <div className="w-full max-w-[80px] h-16 bg-emerald-950/10 border border-emerald-900/30 rounded-xl flex flex-col items-center justify-center text-[10px] text-emerald-500/50 font-black transition-all">
         {num}
       </div>
     );
