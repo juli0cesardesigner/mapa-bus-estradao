@@ -44,7 +44,8 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
       await onSave({
         titulo: title,
         capacidade: capacity,
-        locais_embarque: boardingLocations
+        locais_embarque: boardingLocations,
+        tem_dois_andares: hasTwoFloors
       });
       onClose();
     } catch (error) {
