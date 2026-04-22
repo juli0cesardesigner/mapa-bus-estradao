@@ -28,7 +28,7 @@ export function useData() {
     }
   };
 
-  const createTrip = async (title: string, passengers: any[]) => {
+  const createTrip = async (title: string, passengers: any[], boardingLocations: string[] = [], capacity: number = 46) => {
     const tripId = crypto.randomUUID();
     
     // Função para gerar slug amigável
@@ -66,7 +66,13 @@ export function useData() {
     if (mode === 'supabase') {
       const { data: trip, error: tripError } = await supabase
         .from('viagens')
-        .insert([{ id: tripId, slug, titulo: title }])
+        .insert([{ 
+          id: tripId, 
+          slug, 
+          titulo: title, 
+          locais_embarque: boardingLocations,
+          capacidade: capacity 
+        }])
         .select()
         .single();
       
@@ -109,7 +115,12 @@ export function useData() {
       const { data: trip } = await supabase.from('viagens').select('*').eq('slug', slug).single();
       if (!trip) return { trip: null, passengers: [] };
       const { data: passengers } = await supabase.from('passageiros').select('*').eq('viagem_id', trip.id).order('assento', { ascending: true });
-      return { trip, passengers: passengers || [] };
+      return { 
+        trip, 
+        passengers: passengers || [],
+        boardingLocations: trip.locais_embarque || [],
+        capacity: trip.capacidade || 46
+      };
     } else {
       const trips = JSON.parse(localStorage.getItem('demo_trips') || '[]');
       const trip = trips.find((t: any) => t.slug === slug);
@@ -142,6 +153,10 @@ export function useData() {
       const colors = generateLocationColors(locations);
       passengerToSave.cor_hex = colors[passengerToSave.localidade] || '#3B82F6';
     }
+
+    // Adicionar campos extras se existirem
+    if (passenger.telefone) passengerToSave.telefone = passenger.telefone;
+    if (passenger.cpf) passengerToSave.cpf = passenger.cpf;
 
     if (mode === 'supabase') {
       if (passenger.id) {
@@ -198,6 +213,41 @@ export function useData() {
     createTrip, 
     upsertPassenger, 
     deletePassenger,
-    deleteTrip
+    deleteTrip,
+    reserveSeat: async (slug: string, passenger: any) => {
+      // 1. Validar se o assento já está ocupado
+      const { data: trip } = await supabase.from('viagens').select('id').eq('slug', slug).single();
+      if (!trip) throw new Error('Viagem não encontrada');
+
+      const { data: existing } = await supabase
+        .from('passageiros')
+        .select('id')
+        .eq('viagem_id', trip.id)
+        .eq('assento', passenger.assento)
+        .single();
+
+      if (existing) throw new Error('Este assento já foi reservado por outra pessoa.');
+
+      // 2. Tentar inserir (a constraint unique_viagem_assento garante no banco)
+      const passengerToSave = {
+        ...passenger,
+        viagem_id: trip.id,
+        nome: passenger.nome.toUpperCase().trim(),
+        localidade: passenger.localidade.toUpperCase().trim(),
+        embarcado: false
+      };
+
+      // Gerar cor para o local
+      const { passengers } = await getBoardingData(slug);
+      const locations = Array.from(new Set([...passengers.map((p: any) => (p.localidade || '').toUpperCase().trim()), passengerToSave.localidade]));
+      const colors = generateLocationColors(locations);
+      passengerToSave.cor_hex = colors[passengerToSave.localidade] || '#3B82F6';
+
+      const { error } = await supabase.from('passageiros').insert([passengerToSave]);
+      if (error) {
+        if (error.code === '23505') throw new Error('Este assento acabou de ser ocupado. Por favor, escolha outro.');
+        throw error;
+      }
+    }
   };
 }

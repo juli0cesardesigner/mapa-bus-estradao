@@ -502,6 +502,8 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                   nome: formData.get('nome'),
                   assento: parseInt(formData.get('assento') as string),
                   localidade: formData.get('localidade'),
+                  telefone: formData.get('telefone'),
+                  cpf: formData.get('cpf'),
                 });
               }}
               className="p-8 space-y-6 overflow-y-auto"
@@ -515,6 +517,27 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                   className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-white font-bold focus:outline-none focus:border-blue-600 transition-all placeholder:text-zinc-700"
                   placeholder="EX: JOÃO DA SILVA"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">Telefone</label>
+                  <input 
+                    name="telefone"
+                    defaultValue={editingPassenger?.telefone}
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-white font-bold focus:outline-none focus:border-blue-600 transition-all placeholder:text-zinc-700"
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest ml-1">CPF</label>
+                  <input 
+                    name="cpf"
+                    defaultValue={editingPassenger?.cpf}
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-white font-bold focus:outline-none focus:border-blue-600 transition-all placeholder:text-zinc-700"
+                    placeholder="000.000.000-00"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
