@@ -28,7 +28,7 @@ export function useData() {
     }
   };
 
-  const createTrip = async (title: string, passengers: any[], boardingLocations: string[] = [], capacity: number = 46) => {
+  const createTrip = async (title: string, passengers: any[], boardingLocations: string[] = [], capacity: number = 46, tem_dois_andares: boolean = true) => {
     const tripId = crypto.randomUUID();
     
     // Função para gerar slug amigável
