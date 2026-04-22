@@ -14,6 +14,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
   const [capacity, setCapacity] = React.useState(46);
   const [locationInput, setLocationInput] = React.useState('');
   const [boardingLocations, setBoardingLocations] = React.useState<string[]>([]);
+  const [hasTwoFloors, setHasTwoFloors] = React.useState(true);
   const [isUploading, setIsUploading] = React.useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
