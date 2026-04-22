@@ -223,6 +223,20 @@ export function useData() {
     }
   };
 
+  const updateTrip = async (id: string, updates: { titulo?: string; capacidade?: number; locais_embarque?: string[] }) => {
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('viagens')
+        .update(updates)
+        .eq('id', id);
+      if (error) throw error;
+    } else {
+      const trips = JSON.parse(localStorage.getItem('demo_trips') || '[]');
+      const updated = trips.map((t: any) => t.id === id ? { ...t, ...updates } : t);
+      localStorage.setItem('demo_trips', JSON.stringify(updated));
+    }
+  };
+
   const deleteTrip = async (id: string, slug: string) => {
     if (isSupabaseConfigured) {
       const { error } = await supabase.from('viagens').delete().eq('id', id);
@@ -240,6 +254,7 @@ export function useData() {
     getTrips, 
     getBoardingData, 
     updatePassenger, 
+    updateTrip,
     createTrip, 
     upsertPassenger, 
     deletePassenger,

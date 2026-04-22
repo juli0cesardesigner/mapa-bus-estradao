@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
 import { useData } from '@/hooks/useData';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { ImportForm } from '@/components/ImportForm';
-import { ClipboardCopy, ExternalLink, Info, Trash2 } from 'lucide-react';
+import { EditTripModal } from '@/components/EditTripModal';
+import { ClipboardCopy, ExternalLink, Info, Trash2, Settings2 } from 'lucide-react';
 
 export default function AdminPage() {
   const [trips, setTrips] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [editingTrip, setEditingTrip] = React.useState<any>(null);
   const dataLayer = useData();
 
   React.useEffect(() => {
@@ -102,6 +103,18 @@ export default function AdminPage() {
     alert(`${type === 'reserve' ? 'Link de Reserva' : 'Link do Mapa'} copiado!`);
   };
 
+  const handleUpdateTrip = async (updates: any) => {
+    if (!editingTrip) return;
+    try {
+      await dataLayer.updateTrip(editingTrip.id, updates);
+      fetchTrips();
+      setEditingTrip(null);
+    } catch (error) {
+      console.error('Erro ao atualizar viagem:', error);
+      alert('Erro ao atualizar parâmetros da viagem.');
+    }
+  };
+
   const handleDeleteTrip = async (id: string, slug: string) => {
     if (confirm('ATENÇÃO: Isso excluirá permanentEMENTE esta viagem e todos os dados de passageiros. Continuar?')) {
       try {
@@ -170,6 +183,13 @@ export default function AdminPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button 
+                        onClick={() => setEditingTrip(trip)}
+                        className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                        title="Editar Parâmetros"
+                      >
+                        <Settings2 className="w-4 h-4" />
+                      </button>
+                      <button 
                         onClick={() => handleDeleteTrip(trip.id, trip.slug)}
                         className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
                         title="Excluir Viagem"
@@ -214,6 +234,14 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {editingTrip && (
+        <EditTripModal 
+          trip={editingTrip}
+          onClose={() => setEditingTrip(null)}
+          onSave={handleUpdateTrip}
+        />
+      )}
     </div>
   );
 }
