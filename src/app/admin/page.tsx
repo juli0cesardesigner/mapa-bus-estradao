@@ -92,7 +92,7 @@ export default function AdminPage() {
       { assento: 62, nome: "Diego Martineli", localidade: "COLATINA" },
     ];
     const boardingLocations = Array.from(new Set(demoData.map(d => d.localidade)));
-    await handleImport("LISTA REAL - CSV IMPORTADO", demoData, boardingLocations, 62);
+    await handleImport("LISTA REAL - CSV IMPORTADO", demoData, boardingLocations, 46);
   };
 
   const copyLink = (slug: string, type: 'map' | 'reserve' = 'map') => {

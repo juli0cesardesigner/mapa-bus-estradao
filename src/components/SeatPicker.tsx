@@ -27,7 +27,7 @@ export function SeatPicker({ occupiedSeats, selectedSeat, onSelect, capacity = 4
   const floor1Seats = Array.from({ length: 14 }, (_, i) => i + 51); // 51-64 no Inferior
   const floor2Seats = Array.from({ length: 44 }, (_, i) => i + 1); // 1-44 no Superior
   
-  const currentSeats = (floor === 1 ? floor1Seats : floor2Seats).filter(s => s <= Math.max(capacity, 64));
+  const currentSeats = (floor === 1 ? floor1Seats : floor2Seats).filter(s => s <= capacity);
   const numRows = Math.ceil(currentSeats.length / 4);
 
   return (

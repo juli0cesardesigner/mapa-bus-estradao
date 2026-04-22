@@ -128,7 +128,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-400 mb-2">Locais de Embarque (Zero Dúvidas)</label>
+        <label className="block text-sm font-medium text-zinc-400 mb-2">Locais de Embarque</label>
         <div className="flex gap-2 mb-3">
           <input
             type="text"

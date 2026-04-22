@@ -237,10 +237,10 @@ export default function ReservarPage({ params }: { params: { slug: string } }) {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-zinc-500 ml-1">
-                  <MapPin className="w-3 h-3" />
-                  <label className="text-[10px] font-black uppercase tracking-widest">Local de Embarque (Zero Margem de Dúvida)</label>
+              <div className="space-y-4 bg-blue-600/5 p-8 rounded-[2.5rem] border border-blue-500/20">
+                <div className="flex items-center gap-3 text-blue-500 mb-2">
+                  <MapPin className="w-5 h-5" />
+                  <label className="text-xs font-black uppercase tracking-[0.2em]">Onde você vai embarcar?</label>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {boardingLocations.map((loc) => (
