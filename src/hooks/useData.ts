@@ -16,7 +16,7 @@ export function useData() {
   }, []);
 
   const getTrips = async () => {
-    if (mode === 'supabase') {
+    if (isSupabaseConfigured) {
       const { data } = await supabase
         .from('viagens')
         .select('*, passageiros(count)')
@@ -63,7 +63,7 @@ export function useData() {
       };
     });
 
-    if (mode === 'supabase') {
+    if (isSupabaseConfigured) {
       const { data: trip, error: tripError } = await supabase
         .from('viagens')
         .insert([{ 
@@ -111,26 +111,56 @@ export function useData() {
   };
 
   const getBoardingData = async (slug: string) => {
-    if (mode === 'supabase') {
-      const { data: trip } = await supabase.from('viagens').select('*').eq('slug', slug).single();
-      if (!trip) return { trip: null, passengers: [] };
-      const { data: passengers } = await supabase.from('passageiros').select('*').eq('viagem_id', trip.id).order('assento', { ascending: true });
-      return { 
-        trip, 
-        passengers: passengers || [],
-        boardingLocations: trip.locais_embarque || [],
-        capacity: trip.capacidade || 46
-      };
+    const cleanSlug = slug.trim().toLowerCase();
+    
+    if (isSupabaseConfigured) {
+      try {
+        const { data: trip, error: tripError } = await supabase
+          .from('viagens')
+          .select('*')
+          .eq('slug', cleanSlug)
+          .maybeSingle();
+
+        if (tripError) {
+          console.error('Erro Supabase (viagem):', tripError);
+          return { trip: null, passengers: [] };
+        }
+
+        if (!trip) {
+          console.warn('Nenhuma viagem encontrada para o slug:', cleanSlug);
+          return { trip: null, passengers: [] };
+        }
+
+        const { data: passengers, error: passError } = await supabase
+          .from('passageiros')
+          .select('*')
+          .eq('viagem_id', trip.id)
+          .order('assento', { ascending: true });
+
+        if (passError) {
+          console.error('Erro Supabase (passageiros):', passError);
+        }
+
+        return { 
+          trip, 
+          passengers: passengers || [],
+          boardingLocations: trip.locais_embarque || [],
+          capacity: trip.capacidade || 46
+        };
+      } catch (err) {
+        console.error('Erro fatal em getBoardingData:', err);
+        return { trip: null, passengers: [] };
+      }
     } else {
       const trips = JSON.parse(localStorage.getItem('demo_trips') || '[]');
-      const trip = trips.find((t: any) => t.slug === slug);
-      const passengers = JSON.parse(localStorage.getItem(`demo_passengers_${slug}`) || '[]');
+      const trip = trips.find((t: any) => t.slug === cleanSlug);
+      const passengers = JSON.parse(localStorage.getItem(`demo_passengers_${cleanSlug}`) || '[]');
       return { trip, passengers };
     }
   };
 
   const updatePassenger = async (slug: string, id: string, status: boolean) => {
-    if (mode === 'supabase') {
+    if (isSupabaseConfigured) {
       await supabase.from('passageiros').update({ embarcado: status }).eq('id', id);
     } else {
       const passengers = JSON.parse(localStorage.getItem(`demo_passengers_${slug}`) || '[]');
@@ -158,7 +188,7 @@ export function useData() {
     if (passenger.telefone) passengerToSave.telefone = passenger.telefone;
     if (passenger.cpf) passengerToSave.cpf = passenger.cpf;
 
-    if (mode === 'supabase') {
+    if (isSupabaseConfigured) {
       if (passenger.id) {
         // Update
         const { error } = await supabase.from('passageiros').update(passengerToSave).eq('id', passenger.id);
@@ -183,7 +213,7 @@ export function useData() {
   };
 
   const deletePassenger = async (slug: string, id: string) => {
-    if (mode === 'supabase') {
+    if (isSupabaseConfigured) {
       const { error } = await supabase.from('passageiros').delete().eq('id', id);
       if (error) throw error;
     } else {
@@ -194,7 +224,7 @@ export function useData() {
   };
 
   const deleteTrip = async (id: string, slug: string) => {
-    if (mode === 'supabase') {
+    if (isSupabaseConfigured) {
       const { error } = await supabase.from('viagens').delete().eq('id', id);
       if (error) throw error;
     } else {
@@ -215,6 +245,8 @@ export function useData() {
     deletePassenger,
     deleteTrip,
     reserveSeat: async (slug: string, passenger: any) => {
+      if (!isSupabaseConfigured) throw new Error('Supabase não configurado');
+      
       // 1. Validar se o assento já está ocupado
       const { data: trip } = await supabase.from('viagens').select('id').eq('slug', slug).single();
       if (!trip) throw new Error('Viagem não encontrada');
