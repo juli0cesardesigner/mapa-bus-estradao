@@ -22,10 +22,12 @@ interface BusMapProps {
   passengers: Passenger[];
   locationColors: Record<string, string>;
   onToggleBoarding: (id: string, status: boolean) => void;
+  capacity?: number;
+  tem_dois_andares?: boolean;
 }
 
-export function BusMap({ passengers, locationColors, onToggleBoarding }: BusMapProps) {
-  const [floor, setFloor] = useState<1 | 2>(2); // Piso 2 é o padrão (geralmente mais assentos)
+export function BusMap({ passengers, locationColors, onToggleBoarding, capacity = 46, tem_dois_andares = true }: BusMapProps) {
+  const [floor, setFloor] = useState<1 | 2>(tem_dois_andares ? 2 : 2); 
 
   const passengerMap = React.useMemo(() => {
     const map = new Map();
@@ -37,39 +39,41 @@ export function BusMap({ passengers, locationColors, onToggleBoarding }: BusMapP
   const floor1Seats = Array.from({ length: 14 }, (_, i) => i + 51); // 51-64 no Inferior
   const floor2Seats = Array.from({ length: 44 }, (_, i) => i + 1); // 1-44 no Superior
   
-  const currentSeats = floor === 1 ? floor1Seats : floor2Seats;
+  const currentSeats = (floor === 1 ? floor1Seats : floor2Seats).filter(s => s <= capacity);
   const numRows = Math.ceil(currentSeats.length / 4);
 
   return (
     <div className="flex flex-col items-center py-4 animate-fade-in w-full">
       
       {/* Seletor de Piso - Alinhado com a Largura Total */}
-      <div className="flex bg-[#0A0A0A] p-1.5 rounded-2xl mb-8 border border-zinc-900 shadow-2xl w-full">
-        <button
-          onClick={() => setFloor(2)}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
-            floor === 2 
-              ? "bg-zinc-800 text-white shadow-xl" 
-              : "text-zinc-600 hover:text-zinc-400"
-          )}
-        >
-          <Layers className="w-4 h-4" />
-          Piso Superior
-        </button>
-        <button
-          onClick={() => setFloor(1)}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
-            floor === 1 
-              ? "bg-blue-600 text-white shadow-[0_10px_20px_rgba(37,99,235,0.3)]" 
-              : "text-zinc-600 hover:text-zinc-400"
-          )}
-        >
-          <Layers className="w-4 h-4" />
-          Piso Inferior
-        </button>
-      </div>
+      {tem_dois_andares && (
+        <div className="flex bg-[#0A0A0A] p-1.5 rounded-2xl mb-8 border border-zinc-900 shadow-2xl w-full">
+          <button
+            onClick={() => setFloor(2)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
+              floor === 2 
+                ? "bg-zinc-800 text-white shadow-xl" 
+                : "text-zinc-600 hover:text-zinc-400"
+            )}
+          >
+            <Layers className="w-4 h-4" />
+            Piso Superior
+          </button>
+          <button
+            onClick={() => setFloor(1)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-3 py-4 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
+              floor === 1 
+                ? "bg-blue-600 text-white shadow-[0_10px_20px_rgba(37,99,235,0.3)]" 
+                : "text-zinc-600 hover:text-zinc-400"
+            )}
+          >
+            <Layers className="w-4 h-4" />
+            Piso Inferior
+          </button>
+        </div>
+      )}
 
       {/* Frente do Ônibus - Largura Total */}
       <div className="w-full h-20 bg-zinc-950 rounded-t-[4rem] border-x border-t border-zinc-900 flex flex-col items-center justify-center mb-0 relative overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
@@ -166,7 +170,7 @@ export function BusMap({ passengers, locationColors, onToggleBoarding }: BusMapP
 function Seat({ num, passenger, color, onClick }: { num: number; passenger?: any; color?: string; onClick: () => void }) {
   if (!passenger) {
     return (
-      <div className="w-full max-w-[80px] h-16 bg-emerald-950/10 border border-emerald-900/30 rounded-xl flex flex-col items-center justify-center text-[10px] text-emerald-500/50 font-black transition-all">
+      <div className="w-full max-w-[80px] h-16 bg-emerald-950/10 border border-emerald-900/30 rounded-xl flex flex-col items-center justify-center text-[10px] text-emerald-500/50 font-black transition-all opacity-70">
         {num}
       </div>
     );

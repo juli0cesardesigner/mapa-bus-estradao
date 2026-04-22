@@ -18,9 +18,10 @@ interface SeatPickerProps {
   selectedSeat: number | null;
   onSelect: (seat: number) => void;
   capacity?: number;
+  tem_dois_andares?: boolean;
 }
 
-export function SeatPicker({ occupiedSeats, selectedSeat, onSelect, capacity = 46 }: SeatPickerProps) {
+export function SeatPicker({ occupiedSeats, selectedSeat, onSelect, capacity = 46, tem_dois_andares = true }: SeatPickerProps) {
   const [floor, setFloor] = useState<1 | 2>(2);
 
   // Definição de assentos por piso
@@ -33,32 +34,34 @@ export function SeatPicker({ occupiedSeats, selectedSeat, onSelect, capacity = 4
   return (
     <div className="flex flex-col items-center animate-fade-in w-full">
       {/* Seletor de Piso */}
-      <div className="flex bg-[#0A0A0A] p-1.5 rounded-2xl mb-8 border border-zinc-900 shadow-2xl w-full max-w-sm">
-        <button
-          onClick={() => setFloor(2)}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
-            floor === 2 
-              ? "bg-zinc-800 text-white shadow-xl" 
-              : "text-zinc-600 hover:text-zinc-400"
-          )}
-        >
-          <Layers className="w-4 h-4" />
-          Piso Superior
-        </button>
-        <button
-          onClick={() => setFloor(1)}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
-            floor === 1 
-              ? "bg-blue-600 text-white shadow-xl" 
-              : "text-zinc-600 hover:text-zinc-400"
-          )}
-        >
-          <Layers className="w-4 h-4" />
-          Piso Inferior
-        </button>
-      </div>
+      {tem_dois_andares && (
+        <div className="flex bg-[#0A0A0A] p-1.5 rounded-2xl mb-8 border border-zinc-900 shadow-2xl w-full max-w-sm">
+          <button
+            onClick={() => setFloor(2)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
+              floor === 2 
+                ? "bg-zinc-800 text-white shadow-xl" 
+                : "text-zinc-600 hover:text-zinc-400"
+            )}
+          >
+            <Layers className="w-4 h-4" />
+            Piso Superior
+          </button>
+          <button
+            onClick={() => setFloor(1)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-3 py-3 rounded-xl text-[10px] font-black transition-all uppercase tracking-widest",
+              floor === 1 
+                ? "bg-blue-600 text-white shadow-xl" 
+                : "text-zinc-600 hover:text-zinc-400"
+            )}
+          >
+            <Layers className="w-4 h-4" />
+            Piso Inferior
+          </button>
+        </div>
+      )}
 
       {/* Ônibus */}
       <div className="w-full max-w-md bg-[#0D0D0D] border border-zinc-900 rounded-[3rem] p-6 shadow-2xl relative overflow-hidden">
@@ -145,7 +148,7 @@ function Seat({ num, isOccupied, isSelected, onClick }: { num: number; isOccupie
           ? "bg-red-950/30 border-red-900/50 text-red-500/50 cursor-not-allowed" 
           : isSelected
             ? "bg-yellow-500 border-yellow-300 text-black shadow-[0_0_20px_rgba(234,179,8,0.4)] scale-110 z-10"
-            : "bg-emerald-950/20 border-emerald-900/30 text-emerald-500/70 hover:border-emerald-500 hover:bg-emerald-900/20 active:scale-95"
+            : "bg-emerald-950/20 border-emerald-900/30 text-emerald-500/70 hover:border-emerald-500 hover:bg-emerald-900/20 active:scale-95 opacity-70"
       )}
     >
       <span className="text-xs font-black">{num}</span>

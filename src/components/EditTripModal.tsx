@@ -9,14 +9,16 @@ interface EditTripModalProps {
     titulo: string;
     capacidade: number;
     locais_embarque: string[];
+    tem_dois_andares: boolean;
   };
   onClose: () => void;
-  onSave: (updates: { titulo: string; capacidade: number; locais_embarque: string[] }) => Promise<void>;
+  onSave: (updates: { titulo: string; capacidade: number; locais_embarque: string[]; tem_dois_andares: boolean }) => Promise<void>;
 }
 
 export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onSave }) => {
   const [title, setTitle] = React.useState(trip.titulo);
   const [capacity, setCapacity] = React.useState(trip.capacidade);
+  const [hasTwoFloors, setHasTwoFloors] = React.useState(trip.tem_dois_andares ?? true);
   const [locationInput, setLocationInput] = React.useState('');
   const [boardingLocations, setBoardingLocations] = React.useState<string[]>(trip.locais_embarque || []);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -92,6 +94,21 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
                 max="100"
                 required
               />
+            </div>
+            <div className="flex flex-col justify-end pb-1">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input 
+                    type="checkbox" 
+                    checked={hasTwoFloors} 
+                    onChange={(e) => setHasTwoFloors(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-12 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+                  <div className="absolute left-1 top-1 w-4 h-4 bg-zinc-400 rounded-full peer-checked:translate-x-6 peer-checked:bg-white transition-all"></div>
+                </div>
+                <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors">Ônibus 2 Andares</span>
+              </label>
             </div>
           </div>
 

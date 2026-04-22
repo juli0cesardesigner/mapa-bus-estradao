@@ -5,7 +5,7 @@ import { Upload, X, Loader2, Plus, MapPin } from 'lucide-react';
 import { parseCSV, generateLocationColors, type PassengerData } from '@/utils/csv-parser';
 
 interface ImportFormProps {
-  onImport: (title: string, data: any[], boardingLocations: string[], capacity: number) => Promise<void>;
+  onImport: (title: string, data: any[], boardingLocations: string[], capacity: number, tem_dois_andares: boolean) => Promise<void>;
 }
 
 export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
@@ -85,11 +85,12 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
         }
       }
 
-      await onImport(title, processedData, boardingLocations, capacity);
+      await onImport(title, processedData, boardingLocations, capacity, hasTwoFloors);
       setTitle('');
       setFile(null);
       setBoardingLocations([]);
       setCapacity(46);
+      setHasTwoFloors(true);
     } catch (error: any) {
       console.error('Erro ao criar viagem:', error);
       alert(error.message || 'Erro ao processar a viagem. Verifique os dados.');
@@ -124,6 +125,21 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
             max="100"
             required
           />
+        </div>
+        <div className="flex flex-col justify-end pb-1">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <div className="relative">
+              <input 
+                type="checkbox" 
+                checked={hasTwoFloors} 
+                onChange={(e) => setHasTwoFloors(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-12 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+              <div className="absolute left-1 top-1 w-4 h-4 bg-zinc-400 rounded-full peer-checked:translate-x-6 peer-checked:bg-white transition-all"></div>
+            </div>
+            <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors">Ônibus 2 Andares</span>
+          </label>
         </div>
       </div>
 

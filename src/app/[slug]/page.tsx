@@ -310,6 +310,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
             {/* Helper para rótulo de piso */}
             {(() => {
               const getFloorLabel = (seat: number) => {
+                if (!trip?.tem_dois_andares) return { label: '', color: '' };
                 if (seat >= 51) return { label: 'PISO INF', color: 'bg-blue-600/20 text-blue-500' };
                 return { label: 'PISO SUP', color: 'bg-zinc-800 text-zinc-400' };
               };
@@ -360,9 +361,11 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                               >
                                 {p.assento}
                               </div>
-                              <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
-                                {floor.label}
-                              </span>
+                              {trip?.tem_dois_andares && (
+                                <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
+                                  {floor.label}
+                                </span>
+                              )}
                             </div>
 
                             <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
@@ -420,9 +423,11 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                               >
                                 {p.assento}
                               </div>
-                              <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
-                                {floor.label}
-                              </span>
+                              {trip?.tem_dois_andares && (
+                                <span className={cn("text-[7px] font-black px-1.5 py-0.5 rounded-full tracking-tighter", floor.color)}>
+                                  {floor.label}
+                                </span>
+                              )}
                             </div>
 
                             <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
@@ -470,6 +475,8 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
             passengers={passengers} 
             locationColors={locationColors}
             onToggleBoarding={toggleBoarding} 
+            capacity={trip?.capacidade || 46}
+            tem_dois_andares={trip?.tem_dois_andares ?? true}
           />
         )}
       </main>

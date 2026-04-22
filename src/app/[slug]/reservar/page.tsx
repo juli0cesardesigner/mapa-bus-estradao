@@ -150,7 +150,12 @@ export default function ReservarPage({ params }: { params: { slug: string } }) {
           </div>
           <div className="bg-zinc-950 p-6 rounded-2xl border border-zinc-800 text-left space-y-3">
             <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Resumo do Embarque</p>
-            <p className="text-white font-bold">{formData.nome.toUpperCase()}</p>
+            <div className="flex justify-between items-center">
+              <p className="text-white font-bold">{formData.nome.toUpperCase()}</p>
+              <div className="bg-blue-600 text-white px-3 py-1 rounded-lg font-black text-lg">
+                #{selectedSeat}
+              </div>
+            </div>
             <div className="flex items-center gap-2 text-blue-400 text-sm font-black">
               <MapPin className="w-4 h-4" />
               {formData.localidade}
@@ -183,6 +188,7 @@ export default function ReservarPage({ params }: { params: { slug: string } }) {
             selectedSeat={selectedSeat} 
             onSelect={setSelectedSeat}
             capacity={capacity}
+            tem_dois_andares={trip?.tem_dois_andares ?? true}
           />
         </section>
 

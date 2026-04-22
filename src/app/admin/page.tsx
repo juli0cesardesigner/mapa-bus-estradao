@@ -24,9 +24,9 @@ export default function AdminPage() {
     setIsLoading(false);
   };
 
-  const handleImport = async (title: string, passengers: any[], boardingLocations: string[], capacity: number) => {
+  const handleImport = async (title: string, passengers: any[], boardingLocations: string[], capacity: number, tem_dois_andares: boolean) => {
     try {
-      await dataLayer.createTrip(title, passengers, boardingLocations, capacity);
+      await dataLayer.createTrip(title, passengers, boardingLocations, capacity, tem_dois_andares);
       fetchTrips();
     } catch (error: any) {
       console.error('Erro na criação:', error);
@@ -94,7 +94,7 @@ export default function AdminPage() {
       { assento: 62, nome: "Diego Martineli", localidade: "COLATINA" },
     ];
     const boardingLocations = Array.from(new Set(demoData.map(d => d.localidade)));
-    await handleImport("LISTA REAL - CSV IMPORTADO", demoData, boardingLocations, 46);
+    await handleImport("LISTA REAL - CSV IMPORTADO", demoData, boardingLocations, 64, true);
   };
 
   const copyLink = (slug: string, type: 'map' | 'reserve' = 'map') => {

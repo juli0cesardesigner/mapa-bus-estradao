@@ -71,7 +71,8 @@ export function useData() {
           slug, 
           titulo: title, 
           locais_embarque: boardingLocations,
-          capacidade: capacity 
+          capacidade: capacity,
+          tem_dois_andares
         }])
         .select()
         .single();
@@ -100,7 +101,8 @@ export function useData() {
         slug,
         titulo: title,
         created_at: new Date().toISOString(),
-        passageiros: [{ count: passengers.length }]
+        passageiros: [{ count: passengers.length }],
+        tem_dois_andares
       };
       
       const currentTrips = JSON.parse(localStorage.getItem('demo_trips') || '[]');
@@ -145,7 +147,8 @@ export function useData() {
           trip, 
           passengers: passengers || [],
           boardingLocations: trip.locais_embarque || [],
-          capacity: trip.capacidade || 46
+          capacity: trip.capacidade || 46,
+          tem_dois_andares: trip.tem_dois_andares ?? true
         };
       } catch (err) {
         console.error('Erro fatal em getBoardingData:', err);
@@ -223,7 +226,7 @@ export function useData() {
     }
   };
 
-  const updateTrip = async (id: string, updates: { titulo?: string; capacidade?: number; locais_embarque?: string[] }) => {
+  const updateTrip = async (id: string, updates: { titulo?: string; capacidade?: number; locais_embarque?: string[]; tem_dois_andares?: boolean }) => {
     if (isSupabaseConfigured) {
       const { error } = await supabase
         .from('viagens')
