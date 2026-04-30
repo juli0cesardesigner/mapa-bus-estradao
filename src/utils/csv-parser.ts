@@ -27,7 +27,7 @@ export const parseCSV = (file: File): Promise<PassengerData[]> => {
 };
 
 export const generateLocationColors = (locations: string[]) => {
-  const uniqueLocations = Array.from(new Set(locations));
+  const uniqueLocations = Array.from(new Set(locations.map(l => l.toUpperCase().trim())));
   const colors: Record<string, string> = {};
   
   // Paleta de cores vibrantes e modernas
@@ -49,4 +49,44 @@ export const generateLocationColors = (locations: string[]) => {
   });
 
   return colors;
+};
+
+export const parseRawText = (text: string): PassengerData[] => {
+  const lines = text.split('\n').filter(line => line.trim().length > 0);
+  
+  return lines.map(line => {
+    // Regex para tentar extrair: (Assento) - (Nome) - (Localidade)
+    // Suporta formatos como:
+    // "01 - Joao Silva - Centro"
+    // "Joao Silva - Centro"
+    // "Joao Silva"
+    // "01 Joao Silva"
+    
+    let assento = 0;
+    let nome = '';
+    let localidade = 'GERAL';
+
+    // 1. Tentar extrair assento no início
+    const seatMatch = line.match(/^(\d+)\s*[\.\-\/\s]*/);
+    if (seatMatch) {
+      assento = parseInt(seatMatch[1]);
+      line = line.replace(seatMatch[0], '');
+    }
+
+    // 2. Tentar extrair localidade no final (após - ou ;)
+    const locMatch = line.match(/\s*[\-\;\/\|]\s*([^-\;\/\|]+)$/);
+    if (locMatch) {
+      localidade = locMatch[1].trim().toUpperCase();
+      line = line.replace(locMatch[0], '');
+    }
+
+    // 3. O que sobrou é o nome
+    nome = line.trim().toUpperCase();
+
+    return {
+      nome: nome || 'PASSAGEIRO SEM NOME',
+      assento: assento,
+      localidade: localidade || 'GERAL'
+    };
+  });
 };

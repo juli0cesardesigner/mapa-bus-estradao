@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Upload, X, Loader2, Plus, MapPin } from 'lucide-react';
-import { parseCSV, generateLocationColors, type PassengerData } from '@/utils/csv-parser';
+import { parseCSV, parseRawText, generateLocationColors, type PassengerData } from '@/utils/csv-parser';
 
 interface ImportFormProps {
   onImport: (title: string, data: any[], boardingLocations: string[], capacity: number, tem_dois_andares: boolean) => Promise<void>;
@@ -16,6 +16,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
   const [boardingLocations, setBoardingLocations] = React.useState<string[]>([]);
   const [hasTwoFloors, setHasTwoFloors] = React.useState(true);
   const [isUploading, setIsUploading] = React.useState(false);
+  const [rawText, setRawText] = React.useState('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -47,10 +48,10 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
     e.stopPropagation();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.name.endsWith('.csv')) {
+      if (droppedFile.name.endsWith('.csv') || droppedFile.name.endsWith('.txt')) {
         setFile(droppedFile);
       } else {
-        alert('Por favor, selecione apenas arquivos .csv');
+        alert('Por favor, selecione apenas arquivos .csv ou .txt');
       }
     }
   };
@@ -58,38 +59,50 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title) return;
-    if (boardingLocations.length === 0) {
-      alert('Por favor, adicione pelo menos um local de embarque.');
-      return;
-    }
 
     setIsUploading(true);
     try {
       let processedData: any[] = [];
+      let currentBoardingLocations: string[] = [];
       
       if (file) {
-        const rawData = await parseCSV(file);
-        if (rawData && rawData.length > 0) {
-          const locations = rawData.map(p => p.localidade);
-          // Adicionar locais do CSV aos locais de embarque se não existirem
-          const allLocations = Array.from(new Set([...boardingLocations, ...locations.map(l => l.toUpperCase())]));
-          const colors = generateLocationColors(allLocations);
-
-          processedData = rawData.map(p => ({
-            ...p,
-            cor_hex: colors[p.localidade.toUpperCase()] || '#3B82F6',
-            embarcado: false
-          }));
-          
-          // Atualizar locais se necessário
-          setBoardingLocations(allLocations);
+        if (file.name.endsWith('.csv')) {
+          processedData = await parseCSV(file);
+        } else {
+          const text = await file.text();
+          processedData = parseRawText(text);
         }
+      } else if (rawText.trim()) {
+        processedData = parseRawText(rawText);
       }
 
-      await onImport(title, processedData, boardingLocations, capacity, hasTwoFloors);
+      if (processedData.length > 0) {
+        const locations = processedData.map(p => p.localidade);
+        const allLocations = Array.from(new Set([...boardingLocations, ...locations.map(l => l.toUpperCase().trim())]));
+        const colors = generateLocationColors(allLocations);
+
+        processedData = processedData.map(p => ({
+          ...p,
+          cor_hex: colors[p.localidade.toUpperCase().trim()] || '#3B82F6',
+          embarcado: false
+        }));
+        
+        // Atualizar locais se necessário
+        setBoardingLocations(allLocations);
+        // Se não houver locais de embarque cadastrados e detectamos alguns, usamos eles
+        currentBoardingLocations = allLocations;
+      } else if (boardingLocations.length === 0) {
+        // Fallback se não houver nada
+        currentBoardingLocations = ['GERAL'];
+      } else {
+        currentBoardingLocations = boardingLocations;
+      }
+
+      await onImport(title, processedData, currentBoardingLocations, capacity, hasTwoFloors);
       setTitle('');
       setFile(null);
       setBoardingLocations([]);
+      setRawText('');
       setCapacity(46);
       setHasTwoFloors(true);
     } catch (error: any) {
@@ -145,7 +158,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-400 mb-2">Locais de Embarque</label>
+        <label className="block text-sm font-medium text-zinc-400 mb-2">Locais de Embarque (Opcional)</label>
         <div className="flex gap-2 mb-3">
           <input
             type="text"
@@ -181,18 +194,26 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
       </div>
 
       <div className="relative group">
-        <label className="block text-sm font-medium text-zinc-400 mb-2">Importar Lista Pronta (Opcional - CSV)</label>
+        <label className="block text-sm font-medium text-zinc-400 mb-2">Importar Lista (CSV, TXT ou Colar)</label>
+        
+        <textarea
+          value={rawText}
+          onChange={(e) => setRawText(e.target.value)}
+          placeholder="Cole sua lista aqui...&#10;Ex:&#10;01 - João Silva - Centro&#10;02 - Maria Oliveira - Dutra"
+          className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white focus:ring-2 focus:ring-blue-500 transition-all outline-none mb-4 resize-none font-mono"
+        />
+
         <div 
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-800 border-dashed rounded-2xl group-hover:border-zinc-700 transition-colors cursor-pointer"
+          className="flex justify-center px-6 pt-5 pb-6 border-2 border-zinc-800 border-dashed rounded-2xl group-hover:border-zinc-700 transition-colors cursor-pointer"
         >
           <div className="space-y-1 text-center">
             <Upload className="mx-auto h-8 w-8 text-zinc-500 group-hover:text-zinc-400 transition-colors" />
             <div className="flex text-xs text-zinc-400 justify-center">
               <label className="relative cursor-pointer rounded-md font-medium text-blue-500 hover:text-blue-400">
-                <span>Upload CSV</span>
-                <input type="file" className="sr-only" accept=".csv" onChange={handleFileChange} />
+                <span>Upload CSV/TXT</span>
+                <input type="file" className="sr-only" accept=".csv,.txt" onChange={handleFileChange} />
               </label>
               <p className="pl-1 text-zinc-500">ou arraste e solte</p>
             </div>
