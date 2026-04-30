@@ -116,6 +116,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
   }, [passengers]);
 
   const locations = Array.from(new Set(passengers.map(p => (p.localidade || 'Geral').toUpperCase().trim())));
+  const hasCities = locations.some(loc => loc !== 'GERAL');
   
   const filteredPassengers = passengers.filter(p => {
     return !selectedLocation || (p.localidade || 'Geral').toUpperCase().trim() === selectedLocation;
@@ -261,11 +262,12 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                   : "bg-zinc-900/50 text-zinc-500 border-zinc-800 hover:border-zinc-700"
               )}
             >
-              TODOS
+              {!hasCities ? 'POLTRONAS' : 'TODOS'}
             </button>
             {locations.map((loc) => {
               const color = locationColors[loc] || '#3B82F6';
               const isSelected = selectedLocation === loc;
+              const displayLoc = (!hasCities && loc === 'GERAL') ? 'ALFABÉTICA' : loc;
               return (
                 <button
                   key={loc}
@@ -283,7 +285,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                 >
                   <div className={cn("w-1.5 h-1.5 rounded-full", isSelected ? "bg-white" : "")} 
                        style={{ backgroundColor: !isSelected ? color : undefined }} />
-                  <span className="truncate max-w-[80px]">{loc}</span>
+                  <span className="truncate max-w-[80px]">{displayLoc}</span>
                 </button>
               );
             })}
@@ -373,7 +375,9 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                               <p className="font-bold text-[10px] text-zinc-400 uppercase truncate mt-1 leading-tight">{rest || ' '}</p>
                               <div className="flex items-center gap-1.5 mt-1.5">
                                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-                                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest truncate">{p.localidade}</p>
+                                <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest truncate">
+                                  {(!hasCities && (!p.localidade || p.localidade.toUpperCase() === 'GERAL')) ? 'ALFABÉTICA' : (p.localidade || 'GERAL')}
+                                </p>
                               </div>
                             </div>
                             
@@ -433,7 +437,9 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                             <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
                               <p className="font-black text-lg text-zinc-300 uppercase leading-none truncate">{firstName}</p>
                               <p className="font-bold text-[10px] text-zinc-600 uppercase truncate mt-1 leading-tight">{rest || ' '}</p>
-                              <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-widest truncate mt-1.5">{p.localidade}</p>
+                              <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-widest truncate mt-1.5">
+                                {(!hasCities && (!p.localidade || p.localidade.toUpperCase() === 'GERAL')) ? 'ALFABÉTICA' : (p.localidade || 'GERAL')}
+                              </p>
                             </div>
 
                             <div className="flex items-center gap-2 shrink-0">
