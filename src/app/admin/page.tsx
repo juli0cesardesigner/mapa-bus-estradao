@@ -24,13 +24,21 @@ export default function AdminPage() {
     setIsLoading(false);
   };
 
-  const handleImport = async (title: string, passengers: any[], boardingLocations: string[], capacity: number, tem_dois_andares: boolean) => {
+  const handleImport = async (
+    title: string, 
+    passengers: any[], 
+    boardingLocations: string[], 
+    capacity: number, 
+    tem_dois_andares: boolean,
+    assentos_superior: number = 44,
+    assentos_inferior: number = 12
+  ) => {
     try {
-      await dataLayer.createTrip(title, passengers, boardingLocations, capacity, tem_dois_andares);
+      await dataLayer.createTrip(title, passengers, boardingLocations, capacity, tem_dois_andares, assentos_superior, assentos_inferior);
       fetchTrips();
     } catch (error: any) {
       console.error('Erro na criação:', error);
-      alert('Erro ao criar viagem. Verifique se o nome já existe ou se há problemas de conexão.');
+      alert('Erro ao criar viagem: ' + (error.message || JSON.stringify(error)));
     }
   };
 
@@ -123,6 +131,7 @@ export default function AdminPage() {
         fetchTrips();
       } catch (error) {
         console.error('Erro ao excluir viagem:', error);
+        alert('Erro ao excluir a viagem. Verifique sua conexão ou tente novamente.');
       }
     }
   };

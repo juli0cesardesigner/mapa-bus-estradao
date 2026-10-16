@@ -5,18 +5,47 @@ import { Upload, X, Loader2, Plus, MapPin } from 'lucide-react';
 import { parseCSV, parseRawText, generateLocationColors, type PassengerData } from '@/utils/csv-parser';
 
 interface ImportFormProps {
-  onImport: (title: string, data: any[], boardingLocations: string[], capacity: number, tem_dois_andares: boolean) => Promise<void>;
+  onImport: (
+    title: string, 
+    data: any[], 
+    boardingLocations: string[], 
+    capacity: number, 
+    tem_dois_andares: boolean,
+    assentos_superior: number,
+    assentos_inferior: number
+  ) => Promise<void>;
 }
 
 export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
   const [title, setTitle] = React.useState('');
   const [file, setFile] = React.useState<File | null>(null);
-  const [capacity, setCapacity] = React.useState(46);
+  const [hasTwoFloors, setHasTwoFloors] = React.useState(true);
+  const [superiorSeats, setSuperiorSeats] = React.useState(48);
+  const [inferiorSeats, setInferiorSeats] = React.useState(12);
+  const [capacity, setCapacity] = React.useState(60);
   const [locationInput, setLocationInput] = React.useState('');
   const [boardingLocations, setBoardingLocations] = React.useState<string[]>([]);
-  const [hasTwoFloors, setHasTwoFloors] = React.useState(true);
+  const [historicalLocations, setHistoricalLocations] = React.useState<string[]>([]);
   const [isUploading, setIsUploading] = React.useState(false);
   const [rawText, setRawText] = React.useState('');
+
+  // Sincronizar capacidade quando mudar assentos dos andares
+  React.useEffect(() => {
+    if (hasTwoFloors) {
+      setCapacity(superiorSeats + inferiorSeats);
+    }
+  }, [hasTwoFloors, superiorSeats, inferiorSeats]);
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('mapabus_historical_locations');
+    if (saved) {
+      try {
+        setHistoricalLocations(JSON.parse(saved));
+      } catch (e) {
+        console.error('Error parsing historical locations', e);
+      }
+    }
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -30,12 +59,29 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
       if (!boardingLocations.includes(loc)) {
         setBoardingLocations([...boardingLocations, loc]);
       }
+      if (!historicalLocations.includes(loc)) {
+        const newHist = [...historicalLocations, loc];
+        setHistoricalLocations(newHist);
+        localStorage.setItem('mapabus_historical_locations', JSON.stringify(newHist));
+      }
       setLocationInput('');
     }
   };
 
   const removeLocation = (loc: string) => {
     setBoardingLocations(boardingLocations.filter(l => l !== loc));
+  };
+
+  const removeHistoricalLocation = (loc: string) => {
+    const newHist = historicalLocations.filter(l => l !== loc);
+    setHistoricalLocations(newHist);
+    localStorage.setItem('mapabus_historical_locations', JSON.stringify(newHist));
+  };
+
+  const addFromHistory = (loc: string) => {
+    if (!boardingLocations.includes(loc)) {
+      setBoardingLocations([...boardingLocations, loc]);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -81,11 +127,28 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
         const allLocations = Array.from(new Set([...boardingLocations, ...locations.map(l => l.toUpperCase().trim())]));
         const colors = generateLocationColors(allLocations);
 
-        processedData = processedData.map(p => ({
-          ...p,
-          cor_hex: colors[p.localidade.toUpperCase().trim()] || '#3B82F6',
-          embarcado: false
-        }));
+        let currentSeat = 1;
+        const usedSeats = new Set<number>();
+        
+        processedData = processedData.map(p => {
+          let seat = p.assento;
+          if (!seat || seat === 0 || usedSeats.has(seat)) {
+            // Auto-assign next available seat
+            while (usedSeats.has(currentSeat)) {
+              currentSeat++;
+            }
+            seat = currentSeat;
+            currentSeat++;
+          }
+          usedSeats.add(seat);
+          
+          return {
+            ...p,
+            assento: seat,
+            cor_hex: colors[p.localidade.toUpperCase().trim()] || '#3B82F6',
+            embarcado: false
+          };
+        });
         
         // Atualizar locais se necessário
         setBoardingLocations(allLocations);
@@ -98,16 +161,26 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
         currentBoardingLocations = boardingLocations;
       }
 
-      await onImport(title, processedData, currentBoardingLocations, capacity, hasTwoFloors);
+      await onImport(
+        title, 
+        processedData, 
+        currentBoardingLocations, 
+        capacity, 
+        hasTwoFloors, 
+        hasTwoFloors ? superiorSeats : capacity, 
+        hasTwoFloors ? inferiorSeats : 0
+      );
       setTitle('');
       setFile(null);
       setBoardingLocations([]);
       setRawText('');
-      setCapacity(46);
+      setCapacity(60);
+      setSuperiorSeats(48);
+      setInferiorSeats(12);
       setHasTwoFloors(true);
     } catch (error: any) {
       console.error('Erro ao criar viagem:', error);
-      alert(error.message || 'Erro ao processar a viagem. Verifique os dados.');
+      alert('Erro ao processar: ' + (error.message || JSON.stringify(error)));
     } finally {
       setIsUploading(false);
     }
@@ -127,20 +200,10 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-zinc-400 mb-2">Capacidade (Assentos)</label>
-          <input
-            type="number"
-            value={capacity}
-            onChange={(e) => setCapacity(parseInt(e.target.value))}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-            min="1"
-            max="100"
-            required
-          />
-        </div>
-        <div className="flex flex-col justify-end pb-1">
+      {/* Tipo de Ônibus & Andares */}
+      <div className="bg-zinc-950/60 p-4 rounded-2xl border border-zinc-800/80 space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold text-zinc-300">Estrutura do Veículo</span>
           <label className="flex items-center gap-3 cursor-pointer group">
             <div className="relative">
               <input 
@@ -152,9 +215,72 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
               <div className="w-12 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
               <div className="absolute left-1 top-1 w-4 h-4 bg-zinc-400 rounded-full peer-checked:translate-x-6 peer-checked:bg-white transition-all"></div>
             </div>
-            <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors">Ônibus 2 Andares</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 group-hover:text-zinc-200 transition-colors">
+              {hasTwoFloors ? 'Ônibus 2 Andares (DD)' : 'Ônibus Convencional (1 Andar)'}
+            </span>
           </label>
         </div>
+
+        {hasTwoFloors ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-zinc-800/60">
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                Piso Superior (1 até...)
+              </label>
+              <input
+                type="number"
+                value={superiorSeats}
+                onChange={(e) => setSuperiorSeats(Math.max(1, parseInt(e.target.value) || 0))}
+                className="w-full bg-zinc-900 border border-zinc-700/60 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                min="1"
+                max="80"
+                required
+              />
+              <span className="text-[10px] text-zinc-500 mt-1 block">Assentos 1 a {superiorSeats}</span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                Piso Inferior (Qtd.)
+              </label>
+              <select
+                value={inferiorSeats}
+                onChange={(e) => setInferiorSeats(parseInt(e.target.value))}
+                className="w-full bg-zinc-900 border border-zinc-700/60 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+              >
+                <option value={12}>12 lugares (51 a 62)</option>
+                <option value={16}>16 lugares (51 a 66)</option>
+                <option value={8}>8 lugares (51 a 58)</option>
+                <option value={10}>10 lugares (51 a 60)</option>
+                <option value={14}>14 lugares (51 a 64)</option>
+              </select>
+              <span className="text-[10px] text-zinc-500 mt-1 block">Começa no 51</span>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                Capacidade Total
+              </label>
+              <div className="w-full bg-zinc-900/80 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-bold text-blue-400 flex items-center justify-between">
+                <span>{capacity} poltronas</span>
+                <span className="text-[10px] text-zinc-500 font-normal">Auto</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Capacidade Total (Assentos)</label>
+            <input
+              type="number"
+              value={capacity}
+              onChange={(e) => setCapacity(parseInt(e.target.value) || 46)}
+              className="w-full max-w-xs bg-zinc-900 border border-zinc-700/60 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              min="1"
+              max="100"
+              required
+            />
+          </div>
+        )}
       </div>
 
       <div>
@@ -177,7 +303,7 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
           </button>
         </div>
         
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-4">
           {boardingLocations.map((loc) => (
             <span key={loc} className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold animate-in fade-in zoom-in duration-300">
               <MapPin className="w-3 h-3" />
@@ -191,6 +317,28 @@ export const ImportForm: React.FC<ImportFormProps> = ({ onImport }) => {
             <p className="text-xs text-zinc-600 italic">Nenhum local adicionado ainda.</p>
           )}
         </div>
+
+        {historicalLocations.length > 0 && (
+          <div className="bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-3">
+            <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-2">Locais Anteriores (Clique para adicionar)</p>
+            <div className="flex flex-wrap gap-2">
+              {historicalLocations.filter(loc => !boardingLocations.includes(loc)).map((loc) => (
+                <span key={loc} className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-zinc-800 hover:text-zinc-300 transition-colors cursor-pointer group">
+                  <span onClick={() => addFromHistory(loc)} className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3" />
+                    {loc}
+                  </span>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); removeHistoricalLocation(loc); }} className="hover:text-red-400 ml-1 opacity-50 group-hover:opacity-100 transition-opacity" title="Remover do histórico">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              {historicalLocations.filter(loc => !boardingLocations.includes(loc)).length === 0 && (
+                <p className="text-xs text-zinc-600 italic">Todos os locais do histórico já foram adicionados.</p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="relative group">

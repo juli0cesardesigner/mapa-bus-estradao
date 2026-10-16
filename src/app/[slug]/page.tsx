@@ -483,6 +483,8 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
             onToggleBoarding={toggleBoarding} 
             capacity={trip?.capacidade || 46}
             tem_dois_andares={trip?.tem_dois_andares ?? true}
+            assentos_superior={trip?.assentos_superior || 44}
+            assentos_inferior={trip?.assentos_inferior || 12}
           />
         )}
       </main>

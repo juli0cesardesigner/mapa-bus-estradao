@@ -10,18 +10,47 @@ interface EditTripModalProps {
     capacidade: number;
     locais_embarque: string[];
     tem_dois_andares: boolean;
+    assentos_superior?: number;
+    assentos_inferior?: number;
   };
   onClose: () => void;
-  onSave: (updates: { titulo: string; capacidade: number; locais_embarque: string[]; tem_dois_andares: boolean }) => Promise<void>;
+  onSave: (updates: { 
+    titulo: string; 
+    capacidade: number; 
+    locais_embarque: string[]; 
+    tem_dois_andares: boolean;
+    assentos_superior?: number;
+    assentos_inferior?: number;
+  }) => Promise<void>;
 }
 
 export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onSave }) => {
   const [title, setTitle] = React.useState(trip.titulo);
-  const [capacity, setCapacity] = React.useState(trip.capacidade);
   const [hasTwoFloors, setHasTwoFloors] = React.useState(trip.tem_dois_andares ?? true);
+  const [superiorSeats, setSuperiorSeats] = React.useState(trip.assentos_superior || 44);
+  const [inferiorSeats, setInferiorSeats] = React.useState(trip.assentos_inferior || 12);
+  const [capacity, setCapacity] = React.useState(trip.capacidade || 56);
   const [locationInput, setLocationInput] = React.useState('');
   const [boardingLocations, setBoardingLocations] = React.useState<string[]>(trip.locais_embarque || []);
+  const [historicalLocations, setHistoricalLocations] = React.useState<string[]>([]);
   const [isSaving, setIsSaving] = React.useState(false);
+
+  React.useEffect(() => {
+    if (hasTwoFloors) {
+      setCapacity(superiorSeats + inferiorSeats);
+    }
+  }, [hasTwoFloors, superiorSeats, inferiorSeats]);
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('mapabus_historical_locations');
+    if (saved) {
+      try {
+        setHistoricalLocations(JSON.parse(saved));
+      } catch (e) {
+        console.error('Error parsing historical locations', e);
+      }
+    }
+  }, []);
 
   const handleAddLocation = () => {
     if (locationInput.trim()) {
@@ -29,12 +58,29 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
       if (!boardingLocations.includes(loc)) {
         setBoardingLocations([...boardingLocations, loc]);
       }
+      if (!historicalLocations.includes(loc)) {
+        const newHist = [...historicalLocations, loc];
+        setHistoricalLocations(newHist);
+        localStorage.setItem('mapabus_historical_locations', JSON.stringify(newHist));
+      }
       setLocationInput('');
     }
   };
 
   const removeLocation = (loc: string) => {
     setBoardingLocations(boardingLocations.filter(l => l !== loc));
+  };
+
+  const removeHistoricalLocation = (loc: string) => {
+    const newHist = historicalLocations.filter(l => l !== loc);
+    setHistoricalLocations(newHist);
+    localStorage.setItem('mapabus_historical_locations', JSON.stringify(newHist));
+  };
+
+  const addFromHistory = (loc: string) => {
+    if (!boardingLocations.includes(loc)) {
+      setBoardingLocations([...boardingLocations, loc]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,7 +91,9 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
         titulo: title,
         capacidade: capacity,
         locais_embarque: boardingLocations,
-        tem_dois_andares: hasTwoFloors
+        tem_dois_andares: hasTwoFloors,
+        assentos_superior: hasTwoFloors ? superiorSeats : capacity,
+        assentos_inferior: hasTwoFloors ? inferiorSeats : 0
       });
       onClose();
     } catch (error) {
@@ -83,20 +131,10 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-2">Capacidade (Assentos)</label>
-              <input
-                type="number"
-                value={capacity}
-                onChange={(e) => setCapacity(parseInt(e.target.value))}
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                min="1"
-                max="100"
-                required
-              />
-            </div>
-            <div className="flex flex-col justify-end pb-1">
+          {/* Tipo de Ônibus & Andares */}
+          <div className="bg-zinc-950/60 p-4 rounded-2xl border border-zinc-800/80 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-zinc-300">Estrutura do Veículo</span>
               <label className="flex items-center gap-3 cursor-pointer group">
                 <div className="relative">
                   <input 
@@ -108,9 +146,72 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
                   <div className="w-12 h-6 bg-zinc-800 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
                   <div className="absolute left-1 top-1 w-4 h-4 bg-zinc-400 rounded-full peer-checked:translate-x-6 peer-checked:bg-white transition-all"></div>
                 </div>
-                <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors">Ônibus 2 Andares</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 group-hover:text-zinc-200 transition-colors">
+                  {hasTwoFloors ? 'Ônibus 2 Andares (DD)' : 'Ônibus Convencional (1 Andar)'}
+                </span>
               </label>
             </div>
+
+            {hasTwoFloors ? (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-zinc-800/60">
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Piso Superior (1 até...)
+                  </label>
+                  <input
+                    type="number"
+                    value={superiorSeats}
+                    onChange={(e) => setSuperiorSeats(Math.max(1, parseInt(e.target.value) || 0))}
+                    className="w-full bg-zinc-900 border border-zinc-700/60 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    min="1"
+                    max="80"
+                    required
+                  />
+                  <span className="text-[10px] text-zinc-500 mt-1 block">Assentos 1 a {superiorSeats}</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Piso Inferior (Qtd.)
+                  </label>
+                  <select
+                    value={inferiorSeats}
+                    onChange={(e) => setInferiorSeats(parseInt(e.target.value))}
+                    className="w-full bg-zinc-900 border border-zinc-700/60 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                  >
+                    <option value={12}>12 lugares (51 a 62)</option>
+                    <option value={16}>16 lugares (51 a 66)</option>
+                    <option value={8}>8 lugares (51 a 58)</option>
+                    <option value={10}>10 lugares (51 a 60)</option>
+                    <option value={14}>14 lugares (51 a 64)</option>
+                  </select>
+                  <span className="text-[10px] text-zinc-500 mt-1 block">Começa no 51</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                    Capacidade Total
+                  </label>
+                  <div className="w-full bg-zinc-900/80 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-bold text-blue-400 flex items-center justify-between">
+                    <span>{capacity} poltronas</span>
+                    <span className="text-[10px] text-zinc-500 font-normal">Auto</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Capacidade Total (Assentos)</label>
+                <input
+                  type="number"
+                  value={capacity}
+                  onChange={(e) => setCapacity(parseInt(e.target.value) || 46)}
+                  className="w-full max-w-xs bg-zinc-900 border border-zinc-700/60 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                  min="1"
+                  max="100"
+                  required
+                />
+              </div>
+            )}
           </div>
 
           <div>
@@ -133,7 +234,7 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
               </button>
             </div>
             
-            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1">
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1 mb-4">
               {boardingLocations.map((loc) => (
                 <span key={loc} className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-bold">
                   <MapPin className="w-3 h-3" />
@@ -144,6 +245,28 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
                 </span>
               ))}
             </div>
+
+            {historicalLocations.length > 0 && (
+              <div className="bg-zinc-950/50 border border-zinc-800/50 rounded-xl p-3">
+                <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-2">Locais Anteriores (Clique para adicionar)</p>
+                <div className="flex flex-wrap gap-2">
+                  {historicalLocations.filter(loc => !boardingLocations.includes(loc)).map((loc) => (
+                    <span key={loc} className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-zinc-800 hover:text-zinc-300 transition-colors cursor-pointer group">
+                      <span onClick={() => addFromHistory(loc)} className="flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3" />
+                        {loc}
+                      </span>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); removeHistoricalLocation(loc); }} className="hover:text-red-400 ml-1 opacity-50 group-hover:opacity-100 transition-opacity" title="Remover do histórico">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                  {historicalLocations.filter(loc => !boardingLocations.includes(loc)).length === 0 && (
+                    <p className="text-xs text-zinc-600 italic">Todos os locais do histórico já foram adicionados.</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="pt-4 flex gap-3">

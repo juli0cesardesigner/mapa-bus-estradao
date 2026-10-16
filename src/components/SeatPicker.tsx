@@ -19,16 +19,31 @@ interface SeatPickerProps {
   onSelect: (seat: number) => void;
   capacity?: number;
   tem_dois_andares?: boolean;
+  assentos_superior?: number;
+  assentos_inferior?: number;
 }
 
-export function SeatPicker({ occupiedSeats, selectedSeat, onSelect, capacity = 46, tem_dois_andares = true }: SeatPickerProps) {
+export function SeatPicker({ 
+  occupiedSeats, 
+  selectedSeat, 
+  onSelect, 
+  capacity = 46, 
+  tem_dois_andares = true,
+  assentos_superior = 44,
+  assentos_inferior = 12
+}: SeatPickerProps) {
   const [floor, setFloor] = useState<1 | 2>(2);
 
-  // Definição de assentos por piso
-  const floor1Seats = Array.from({ length: 14 }, (_, i) => i + 51); // 51-64 no Inferior
-  const floor2Seats = Array.from({ length: 44 }, (_, i) => i + 1); // 1-44 no Superior
+  // Definição de assentos por piso dinâmico
+  const floor1Seats = tem_dois_andares 
+    ? Array.from({ length: assentos_inferior }, (_, i) => i + 51)
+    : [];
+  const floor2Seats = Array.from(
+    { length: tem_dois_andares ? assentos_superior : capacity }, 
+    (_, i) => i + 1
+  );
   
-  const currentSeats = (floor === 1 ? floor1Seats : floor2Seats).filter(s => s <= capacity);
+  const currentSeats = floor === 1 ? floor1Seats : floor2Seats;
   const numRows = Math.ceil(currentSeats.length / 4);
 
   return (

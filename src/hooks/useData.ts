@@ -17,10 +17,14 @@ export function useData() {
 
   const getTrips = async () => {
     if (isSupabaseConfigured) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('viagens')
         .select('*, passageiros(count)')
         .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Erro no getTrips:", error);
+      }
       return data || [];
     } else {
       const demoTrips = JSON.parse(localStorage.getItem('demo_trips') || '[]');
@@ -28,7 +32,15 @@ export function useData() {
     }
   };
 
-  const createTrip = async (title: string, passengers: any[], boardingLocations: string[] = [], capacity: number = 46, tem_dois_andares: boolean = true) => {
+  const createTrip = async (
+    title: string, 
+    passengers: any[], 
+    boardingLocations: string[] = [], 
+    capacity: number = 46, 
+    tem_dois_andares: boolean = true,
+    assentos_superior: number = 44,
+    assentos_inferior: number = 12
+  ) => {
     const tripId = crypto.randomUUID();
     
     // Função para gerar slug amigável
@@ -72,7 +84,9 @@ export function useData() {
           titulo: title, 
           locais_embarque: boardingLocations,
           capacidade: capacity,
-          tem_dois_andares
+          tem_dois_andares,
+          assentos_superior,
+          assentos_inferior
         }])
         .select()
         .single();
@@ -102,7 +116,9 @@ export function useData() {
         titulo: title,
         created_at: new Date().toISOString(),
         passageiros: [{ count: passengers.length }],
-        tem_dois_andares
+        tem_dois_andares,
+        assentos_superior,
+        assentos_inferior
       };
       
       const currentTrips = JSON.parse(localStorage.getItem('demo_trips') || '[]');
@@ -226,7 +242,14 @@ export function useData() {
     }
   };
 
-  const updateTrip = async (id: string, updates: { titulo?: string; capacidade?: number; locais_embarque?: string[]; tem_dois_andares?: boolean }) => {
+  const updateTrip = async (id: string, updates: { 
+    titulo?: string; 
+    capacidade?: number; 
+    locais_embarque?: string[]; 
+    tem_dois_andares?: boolean;
+    assentos_superior?: number;
+    assentos_inferior?: number;
+  }) => {
     if (isSupabaseConfigured) {
       const { error } = await supabase
         .from('viagens')
@@ -242,6 +265,7 @@ export function useData() {
 
   const deleteTrip = async (id: string, slug: string) => {
     if (isSupabaseConfigured) {
+      await supabase.from('passageiros').delete().eq('viagem_id', id);
       const { error } = await supabase.from('viagens').delete().eq('id', id);
       if (error) throw error;
     } else {

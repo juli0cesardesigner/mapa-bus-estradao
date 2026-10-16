@@ -189,6 +189,8 @@ export default function ReservarPage({ params }: { params: { slug: string } }) {
             onSelect={setSelectedSeat}
             capacity={capacity}
             tem_dois_andares={trip?.tem_dois_andares ?? true}
+            assentos_superior={trip?.assentos_superior || 44}
+            assentos_inferior={trip?.assentos_inferior || 12}
           />
         </section>
 

@@ -24,9 +24,19 @@ interface BusMapProps {
   onToggleBoarding: (id: string, status: boolean) => void;
   capacity?: number;
   tem_dois_andares?: boolean;
+  assentos_superior?: number;
+  assentos_inferior?: number;
 }
 
-export function BusMap({ passengers, locationColors, onToggleBoarding, capacity = 46, tem_dois_andares = true }: BusMapProps) {
+export function BusMap({ 
+  passengers, 
+  locationColors, 
+  onToggleBoarding, 
+  capacity = 46, 
+  tem_dois_andares = true,
+  assentos_superior = 44,
+  assentos_inferior = 12
+}: BusMapProps) {
   const [floor, setFloor] = useState<1 | 2>(tem_dois_andares ? 2 : 2); 
 
   const passengerMap = React.useMemo(() => {
@@ -35,11 +45,16 @@ export function BusMap({ passengers, locationColors, onToggleBoarding, capacity 
     return map;
   }, [passengers]);
 
-  // Definição de assentos por piso conforme planilha real
-  const floor1Seats = Array.from({ length: 14 }, (_, i) => i + 51); // 51-64 no Inferior
-  const floor2Seats = Array.from({ length: 44 }, (_, i) => i + 1); // 1-44 no Superior
+  // Definição de assentos por piso dinâmico
+  const floor1Seats = tem_dois_andares 
+    ? Array.from({ length: assentos_inferior }, (_, i) => i + 51) // Começa no 51 conforme padrão DD
+    : [];
+  const floor2Seats = Array.from(
+    { length: tem_dois_andares ? assentos_superior : capacity }, 
+    (_, i) => i + 1
+  ); // 1 até assentos_superior no Superior
   
-  const currentSeats = (floor === 1 ? floor1Seats : floor2Seats).filter(s => s <= capacity);
+  const currentSeats = floor === 1 ? floor1Seats : floor2Seats;
   const numRows = Math.ceil(currentSeats.length / 4);
 
   return (

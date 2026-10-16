@@ -6,12 +6,23 @@ export interface PassengerData {
   localidade: string;
 }
 
-export const parseCSV = (file: File): Promise<PassengerData[]> => {
+export const parseCSV = async (file: File): Promise<PassengerData[]> => {
+  const text = await file.text();
+  
   return new Promise((resolve, reject) => {
-    Papa.parse(file, {
+    Papa.parse(text, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
+        const headers = results.meta.fields || [];
+        const hasNameHeader = headers.some((h: string) => h.toLowerCase() === 'nome');
+        
+        if (!hasNameHeader) {
+          // Fallback para parseRawText se não encontrar cabeçalhos padrão
+          resolve(parseRawText(text));
+          return;
+        }
+
         const data = results.data.map((row: any) => ({
           nome: (row.nome || row.Nome || '').toUpperCase().trim(),
           assento: parseInt(row.assento || row.Assento || '0'),
@@ -19,7 +30,7 @@ export const parseCSV = (file: File): Promise<PassengerData[]> => {
         }));
         resolve(data);
       },
-      error: (error) => {
+      error: (error: any) => {
         reject(error);
       },
     });
@@ -66,15 +77,15 @@ export const parseRawText = (text: string): PassengerData[] => {
     let nome = '';
     let localidade = 'GERAL';
 
-    // 1. Tentar extrair assento no início
-    const seatMatch = line.match(/^(\d+)\s*[\.\-\/\s]*/);
+    // 1. Tentar extrair assento no início (incluindo tab)
+    const seatMatch = line.match(/^(\d+)\s*[\.\-\/\s\t]*/);
     if (seatMatch) {
       assento = parseInt(seatMatch[1]);
       line = line.replace(seatMatch[0], '');
     }
 
-    // 2. Tentar extrair localidade no final (após - ou ;)
-    const locMatch = line.match(/\s*[\-\;\/\|]\s*([^-\;\/\|]+)$/);
+    // 2. Tentar extrair localidade no final (após -, ;, /, |, ou tab)
+    const locMatch = line.match(/\s*[\-\;\/\|\t]\s*([^-\;\/\|\t]+)$/);
     if (locMatch) {
       localidade = locMatch[1].trim().toUpperCase();
       line = line.replace(locMatch[0], '');
