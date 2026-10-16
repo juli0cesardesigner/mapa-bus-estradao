@@ -160,8 +160,8 @@ export function BusMap({
       {/* Fundo do Ônibus */}
       <div className="w-full h-14 bg-zinc-900 rounded-b-3xl border-x border-b border-zinc-800 shadow-2xl relative flex items-center justify-center">
         <div className="flex gap-2">
-          <div className="w-8 h-1 bg-red-900/40 rounded-full" />
-          <div className="w-8 h-1 bg-red-900/40 rounded-full" />
+          <div className="w-8 h-1 bg-amber-500/30 rounded-full" />
+          <div className="w-8 h-1 bg-amber-500/30 rounded-full" />
         </div>
       </div>
 

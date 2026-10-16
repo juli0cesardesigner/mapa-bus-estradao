@@ -41,18 +41,20 @@ export const generateLocationColors = (locations: string[]) => {
   const uniqueLocations = Array.from(new Set(locations.map(l => l.toUpperCase().trim())));
   const colors: Record<string, string> = {};
   
-  // Paleta de cores vibrantes e modernas
+  // Paleta de cores vibrantes, modernas e sem tons vermelhos
   const palette = [
     '#2563EB', // Azul Royal
-    '#DC2626', // Vermelho Vibrante
+    '#0D9488', // Teal / Verde Petróleo (substituiu vermelho)
     '#059669', // Verde Esmeralda
-    '#D97706', // Âmbar / Laranja
+    '#D97706', // Âmbar / Dourado
     '#7C3AED', // Violeta
-    '#DB2777', // Rosa Choque
+    '#0284C7', // Azul Céu Vibrante
     '#0891B2', // Ciano Profundo
-    '#EA580C', // Laranja Queimado
-    '#4F46E5', // Índigo
-    '#BE185D', // Carmesim
+    '#6366F1', // Índigo Moderno
+    '#10B981', // Menta
+    '#8B5CF6', // Roxo Suave
+    '#F59E0B', // Amarelo Ouro
+    '#14B8A6', // Turquesa
   ];
 
   uniqueLocations.forEach((loc, index) => {

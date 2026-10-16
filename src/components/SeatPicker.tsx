@@ -143,8 +143,8 @@ export function SeatPicker({
           <div className="w-3 h-3 rounded-md bg-yellow-500" />
           Selecionado
         </div>
-        <div className="flex items-center gap-2 text-red-500">
-          <div className="w-3 h-3 rounded-md bg-red-600" />
+        <div className="flex items-center gap-2 text-zinc-400">
+          <div className="w-3 h-3 rounded-md bg-zinc-700" />
           Ocupado
         </div>
       </div>
@@ -160,7 +160,7 @@ function Seat({ num, isOccupied, isSelected, onClick }: { num: number; isOccupie
       className={cn(
         "w-full max-w-[60px] h-14 rounded-xl flex flex-col items-center justify-center transition-all relative group border-2",
         isOccupied 
-          ? "bg-red-950/30 border-red-900/50 text-red-500/50 cursor-not-allowed" 
+          ? "bg-zinc-900/60 border-zinc-800 text-zinc-600 cursor-not-allowed" 
           : isSelected
             ? "bg-yellow-500 border-yellow-300 text-black shadow-[0_0_20px_rgba(234,179,8,0.4)] scale-110 z-10"
             : "bg-emerald-950/20 border-emerald-900/30 text-emerald-500/70 hover:border-emerald-500 hover:bg-emerald-900/20 active:scale-95 opacity-70"

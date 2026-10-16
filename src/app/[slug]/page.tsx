@@ -16,7 +16,10 @@ function cn(...inputs: ClassValue[]) {
 
 export default function CheckPage({ params }: { params: { slug: string } }) {
   const searchParams = useSearchParams();
-  const isReadOnly = searchParams.get('modo') === 'visualizar' || searchParams.get('view') === 'readonly';
+  // Modo passageiro ativado se tiver ?passageiro, ?modo=visualizar ou ?view=readonly
+  const isReadOnly = searchParams.has('passageiro') || 
+                     searchParams.get('modo') === 'visualizar' || 
+                     searchParams.get('view') === 'readonly';
 
   const [trip, setTrip] = React.useState<any>(null);
   const [passengers, setPassengers] = React.useState<any[]>([]);
@@ -158,8 +161,14 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
             {trip.titulo}
           </h1>
           
-          <div className="flex justify-between items-center gap-4">
-            <div className="flex-1 space-y-4 max-w-sm">
+          <div className={cn(
+            "flex items-center gap-4",
+            isReadOnly ? "justify-center" : "justify-between"
+          )}>
+            <div className={cn(
+              "space-y-4 w-full",
+              isReadOnly ? "max-w-md mx-auto" : "flex-1 max-w-sm"
+            )}>
               <div className="flex justify-between items-end">
                 <div className="flex flex-col items-start gap-1">
                   <span className="text-[20px] font-black leading-none flex items-center gap-2">
@@ -192,23 +201,18 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
               </div>
             </div>
 
-            {!isReadOnly ? (
+            {!isReadOnly && (
               <button 
                 onClick={() => {
                   setEditingPassenger(null);
                   setIsEditModalOpen(true);
                 }}
-                className="bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group"
+                className="bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group shrink-0"
                 title="Adicionar Passageiro"
               >
                 <Users className="w-6 h-6 text-white group-hover:rotate-12 transition-transform" />
                 <span className="text-[8px] font-black block mt-1 uppercase tracking-tighter">Novo</span>
               </button>
-            ) : (
-              <div className="bg-zinc-900 border border-zinc-800 p-3.5 rounded-2xl flex flex-col items-center justify-center text-zinc-400">
-                <Eye className="w-5 h-5 text-blue-400 mb-0.5" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500">Visualização</span>
-              </div>
             )}
           </div>
         </div>

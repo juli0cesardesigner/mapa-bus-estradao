@@ -110,8 +110,11 @@ export default function AdminPage() {
     let label = 'Link de Embarque (Equipe)';
 
     if (type === 'passenger') {
-      path = `${slug}?modo=visualizar`;
-      label = 'Link do Passageiro (Visualização)';
+      path = `${slug}?passageiro`;
+      label = 'Link do Passageiro';
+    } else if (type === 'staff') {
+      path = `${slug}?equipe`;
+      label = 'Link da Equipe';
     } else if (type === 'reserve') {
       path = `${slug}/reservar`;
       label = 'Link de Reserva';
