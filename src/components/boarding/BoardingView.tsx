@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useData } from '@/hooks/useData';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { BusMap } from '@/components/BusMap';
-import { Armchair as SeatIcon, List, Users, CheckCircle2, Info, Eye } from 'lucide-react';
+import { Armchair as SeatIcon, List, Users, CheckCircle2, Info, Eye, ArrowDownAZ, ArrowDown10 } from 'lucide-react';
 import { generateLocationColors } from '@/utils/csv-parser';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -34,6 +34,7 @@ export function CheckClientView({
   const [isLoading, setIsLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
   const [view, setView] = React.useState<'list' | 'map'>('list');
+  const [listSort, setListSort] = React.useState<'seat' | 'alpha'>('seat');
   const [selectedLocation, setSelectedLocation] = React.useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [editingPassenger, setEditingPassenger] = React.useState<any>(null);
@@ -243,31 +244,54 @@ export function CheckClientView({
       )}
 
       <main className="max-w-xl mx-auto p-6 space-y-10">
-        {/* Seletor de Visualização Proeminente */}
-        <div className="flex bg-zinc-900/50 p-1.5 rounded-[2rem] border border-zinc-800/50 shadow-2xl backdrop-blur-sm">
-          <button 
-            onClick={() => setView('list')}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-3 py-4 rounded-[1.8rem] font-black text-xs tracking-[0.15em] transition-all duration-300",
-              view === 'list' 
-                ? "bg-white text-black shadow-2xl scale-[1.02]" 
-                : "text-zinc-500 hover:text-zinc-300"
-            )}
-          >
-            <List className="w-5 h-5" />
-            LISTA
-          </button>
+        {/* Controles de Visualização em Duas Linhas */}
+        <div className="space-y-2.5">
+          {/* Linha de Cima: Ordenar Alfabeticamente e Por Assento */}
+          <div className="flex bg-zinc-900/60 p-1 rounded-[1.8rem] border border-zinc-800/60 shadow-xl backdrop-blur-sm gap-1">
+            <button 
+              onClick={() => {
+                setView('list');
+                setListSort('alpha');
+              }}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-[1.5rem] font-black text-[11px] tracking-[0.12em] transition-all duration-300",
+                view === 'list' && listSort === 'alpha'
+                  ? "bg-white text-black shadow-2xl scale-[1.01]" 
+                  : "text-zinc-400 hover:text-white"
+              )}
+            >
+              <ArrowDownAZ className="w-4 h-4" />
+              ALFABÉTICA
+            </button>
+            <button 
+              onClick={() => {
+                setView('list');
+                setListSort('seat');
+              }}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2.5 py-3.5 rounded-[1.5rem] font-black text-[11px] tracking-[0.12em] transition-all duration-300",
+                view === 'list' && listSort === 'seat'
+                  ? "bg-white text-black shadow-2xl scale-[1.01]" 
+                  : "text-zinc-400 hover:text-white"
+              )}
+            >
+              <ArrowDown10 className="w-4 h-4" />
+              POR ASSENTO
+            </button>
+          </div>
+
+          {/* Linha de Baixo: Botão que Exibe os Assentos (Mapa do Ônibus) */}
           <button 
             onClick={() => setView('map')}
             className={cn(
-              "flex-1 flex items-center justify-center gap-3 py-4 rounded-[1.8rem] font-black text-xs tracking-[0.15em] transition-all duration-300",
-              view === 'map' 
-                ? "bg-white text-black shadow-2xl scale-[1.02]" 
-                : "text-zinc-500 hover:text-zinc-300"
+              "w-full flex items-center justify-center gap-3 py-3.5 rounded-[1.8rem] font-black text-xs tracking-[0.15em] border transition-all duration-300 shadow-xl",
+              view === 'map'
+                ? "bg-blue-600 text-white border-blue-500 shadow-[0_10px_25px_rgba(37,99,235,0.35)] scale-[1.01]"
+                : "bg-zinc-900/60 text-zinc-400 border-zinc-800/60 hover:text-white hover:bg-zinc-900/90"
             )}
           >
-            <SeatIcon className="w-5 h-5" />
-            ASSENTOS
+            <SeatIcon className="w-4 h-4" />
+            MAPA DE ASSENTOS
           </button>
         </div>
 
@@ -350,7 +374,7 @@ export function CheckClientView({
               };
 
               const sortFn = (a: any, b: any) => {
-                if (selectedLocation) {
+                if (listSort === 'alpha') {
                   return a.nome.localeCompare(b.nome);
                 }
                 return a.assento - b.assento;
