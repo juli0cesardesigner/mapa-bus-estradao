@@ -41,20 +41,21 @@ export const generateLocationColors = (locations: string[]) => {
   const uniqueLocations = Array.from(new Set(locations.map(l => l.toUpperCase().trim())));
   const colors: Record<string, string> = {};
   
-  // Paleta de cores vibrantes, modernas e sem tons vermelhos
+  // Paleta de cores de alto contraste, cobrindo espectros completamente distintos:
+  // Azul Real, Laranja Quente, Roxo Elétrico, Verde Esmeralda, Ciano Vivo, Rosa Magenta, Amarelo Ouro, etc.
   const palette = [
-    '#2563EB', // Azul Royal
-    '#0D9488', // Teal / Verde Petróleo (substituiu vermelho)
-    '#059669', // Verde Esmeralda
-    '#D97706', // Âmbar / Dourado
-    '#7C3AED', // Violeta
-    '#0284C7', // Azul Céu Vibrante
-    '#0891B2', // Ciano Profundo
-    '#6366F1', // Índigo Moderno
-    '#10B981', // Menta
-    '#8B5CF6', // Roxo Suave
-    '#F59E0B', // Amarelo Ouro
-    '#14B8A6', // Turquesa
+    '#2563EB', // 1. Azul Royal Vivo
+    '#059669', // 2. Verde Esmeralda
+    '#D97706', // 3. Âmbar / Laranja Ocre
+    '#7C3AED', // 4. Violeta / Roxo Escuro
+    '#0891B2', // 5. Ciano Oceânico
+    '#4F46E5', // 6. Índigo Elétrico
+    '#0284C7', // 7. Sky Blue Claro
+    '#9333EA', // 8. Púrpura Intenso
+    '#EAB308', // 9. Amarelo Sol
+    '#64748B', // 10. Ardósia Metálico
+    '#065F46', // 11. Verde Floresta Profundo
+    '#1D4ED8', // 12. Azul Cobalto
   ];
 
   uniqueLocations.forEach((loc, index) => {

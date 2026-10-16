@@ -124,8 +124,8 @@ export function CheckClientView({
     
     const colors: Record<string, string> = {};
     locations.forEach(loc => {
-      const existingColor = passengers.find(p => (p.localidade || 'Geral').toUpperCase().trim() === loc)?.cor_hex;
-      colors[loc] = existingColor || generatedColors[loc] || '#3B82F6';
+      // Priorizar a paleta calculada para garantir diferenciação visual máxima
+      colors[loc] = generatedColors[loc] || '#2563EB';
     });
     return colors;
   }, [passengers]);
