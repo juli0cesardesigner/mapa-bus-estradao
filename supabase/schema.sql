@@ -3,6 +3,9 @@ CREATE TABLE viagens (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   slug TEXT UNIQUE,
   titulo TEXT NOT NULL,
+  locais_embarque TEXT[] DEFAULT '{}',
+  capacidade INTEGER DEFAULT 46,
+  tem_dois_andares BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   admin_id UUID REFERENCES auth.users(id)
 );
