@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useData } from '@/hooks/useData';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { BusMap } from '@/components/BusMap';
-import { Armchair as SeatIcon, List, Users, CheckCircle2, Info } from 'lucide-react';
+import { Armchair as SeatIcon, List, Users, CheckCircle2, Info, Eye } from 'lucide-react';
 import { generateLocationColors } from '@/utils/csv-parser';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -14,6 +15,9 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export default function CheckPage({ params }: { params: { slug: string } }) {
+  const searchParams = useSearchParams();
+  const isReadOnly = searchParams.get('modo') === 'visualizar' || searchParams.get('view') === 'readonly';
+
   const [trip, setTrip] = React.useState<any>(null);
   const [passengers, setPassengers] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -188,16 +192,24 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
               </div>
             </div>
 
-            <button 
-              onClick={() => {
-                setEditingPassenger(null);
-                setIsEditModalOpen(true);
-              }}
-              className="bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group"
-            >
-              <Users className="w-6 h-6 text-white group-hover:rotate-12 transition-transform" />
-              <span className="text-[8px] font-black block mt-1 uppercase tracking-tighter">Novo</span>
-            </button>
+            {!isReadOnly ? (
+              <button 
+                onClick={() => {
+                  setEditingPassenger(null);
+                  setIsEditModalOpen(true);
+                }}
+                className="bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all active:scale-95 group"
+                title="Adicionar Passageiro"
+              >
+                <Users className="w-6 h-6 text-white group-hover:rotate-12 transition-transform" />
+                <span className="text-[8px] font-black block mt-1 uppercase tracking-tighter">Novo</span>
+              </button>
+            ) : (
+              <div className="bg-zinc-900 border border-zinc-800 p-3.5 rounded-2xl flex flex-col items-center justify-center text-zinc-400">
+                <Eye className="w-5 h-5 text-blue-400 mb-0.5" />
+                <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500">Visualização</span>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -381,24 +393,31 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                               </div>
                             </div>
                             
-                            <div className="flex items-center gap-2 shrink-0">
-                              <button 
-                                onClick={() => {
-                                  setEditingPassenger(p);
-                                  setIsEditModalOpen(true);
-                                }}
-                                className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition-colors"
-                              >
-                                <List className="w-4 h-4 text-zinc-400" />
-                              </button>
+                            {!isReadOnly ? (
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button 
+                                  onClick={() => {
+                                    setEditingPassenger(p);
+                                    setIsEditModalOpen(true);
+                                  }}
+                                  className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition-colors"
+                                  title="Editar Passageiro"
+                                >
+                                  <List className="w-4 h-4 text-zinc-400" />
+                                </button>
 
-                              <button
-                                onClick={() => toggleBoarding(p.id, true)}
-                                className="h-10 px-4 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-blue-600 hover:border-blue-500 transition-all active:scale-95 group/btn"
-                              >
-                                <span className="text-[11px] font-black text-zinc-400 group-hover/btn:text-white uppercase tracking-tighter">OK</span>
-                              </button>
-                            </div>
+                                <button
+                                  onClick={() => toggleBoarding(p.id, true)}
+                                  className="h-10 px-4 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-blue-600 hover:border-blue-500 transition-all active:scale-95 group/btn"
+                                >
+                                  <span className="text-[11px] font-black text-zinc-400 group-hover/btn:text-white uppercase tracking-tighter">OK</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="px-2 py-1 rounded-lg bg-zinc-800/40 border border-zinc-700/30 text-[9px] font-black text-zinc-500 uppercase">
+                                Aguardando
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -442,25 +461,33 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
                               </p>
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
-                              <button 
-                                onClick={() => {
-                                  setEditingPassenger(p);
-                                  setIsEditModalOpen(true);
-                                }}
-                                className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:bg-zinc-800 transition-colors text-zinc-700"
-                              >
-                                <List className="w-4 h-4" />
-                              </button>
+                            {!isReadOnly ? (
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button 
+                                  onClick={() => {
+                                    setEditingPassenger(p);
+                                    setIsEditModalOpen(true);
+                                  }}
+                                  className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:bg-zinc-800 transition-colors text-zinc-700"
+                                  title="Editar Passageiro"
+                                >
+                                  <List className="w-4 h-4" />
+                                </button>
 
-                              <button
-                                onClick={() => toggleBoarding(p.id, false)}
-                                className="h-10 px-4 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center group/btn"
-                                title="Desmarcar embarque"
-                              >
-                                <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                              </button>
-                            </div>
+                                <button
+                                  onClick={() => toggleBoarding(p.id, false)}
+                                  className="h-10 px-4 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center group/btn"
+                                  title="Desmarcar embarque"
+                                >
+                                  <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-[9px] font-black text-blue-400 uppercase">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                                Embarcado
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -485,6 +512,7 @@ export default function CheckPage({ params }: { params: { slug: string } }) {
             tem_dois_andares={trip?.tem_dois_andares ?? true}
             assentos_superior={trip?.assentos_superior || 44}
             assentos_inferior={trip?.assentos_inferior || 12}
+            readOnly={isReadOnly}
           />
         )}
       </main>

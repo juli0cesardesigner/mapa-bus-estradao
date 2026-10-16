@@ -21,11 +21,12 @@ interface Passenger {
 interface BusMapProps {
   passengers: Passenger[];
   locationColors: Record<string, string>;
-  onToggleBoarding: (id: string, status: boolean) => void;
+  onToggleBoarding?: (id: string, status: boolean) => void;
   capacity?: number;
   tem_dois_andares?: boolean;
   assentos_superior?: number;
   assentos_inferior?: number;
+  readOnly?: boolean;
 }
 
 export function BusMap({ 
@@ -35,7 +36,8 @@ export function BusMap({
   capacity = 46, 
   tem_dois_andares = true,
   assentos_superior = 44,
-  assentos_inferior = 12
+  assentos_inferior = 12,
+  readOnly = false
 }: BusMapProps) {
   const [floor, setFloor] = useState<1 | 2>(tem_dois_andares ? 2 : 2); 
 
@@ -121,7 +123,7 @@ export function BusMap({
                         num={seatNum} 
                         passenger={p} 
                         color={color}
-                        onClick={() => p && onToggleBoarding(p.id, !p.embarcado)} 
+                        onClick={() => !readOnly && p && onToggleBoarding && onToggleBoarding(p.id, !p.embarcado)} 
                       />
                     </div>
                   );
@@ -144,7 +146,7 @@ export function BusMap({
                         num={seatNum} 
                         passenger={p} 
                         color={color}
-                        onClick={() => p && onToggleBoarding(p.id, !p.embarcado)} 
+                        onClick={() => !readOnly && p && onToggleBoarding && onToggleBoarding(p.id, !p.embarcado)} 
                       />
                     </div>
                   );

@@ -5,7 +5,7 @@ import { useData } from '@/hooks/useData';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { ImportForm } from '@/components/ImportForm';
 import { EditTripModal } from '@/components/EditTripModal';
-import { ClipboardCopy, ExternalLink, Info, Trash2, Settings2 } from 'lucide-react';
+import { ClipboardCopy, ExternalLink, Info, Trash2, Settings2, Eye, ShieldCheck } from 'lucide-react';
 
 export default function AdminPage() {
   const [trips, setTrips] = React.useState<any[]>([]);
@@ -105,11 +105,21 @@ export default function AdminPage() {
     await handleImport("LISTA REAL - CSV IMPORTADO", demoData, boardingLocations, 64, true);
   };
 
-  const copyLink = (slug: string, type: 'map' | 'reserve' = 'map') => {
-    const path = type === 'reserve' ? `${slug}/reservar` : slug;
+  const copyLink = (slug: string, type: 'staff' | 'passenger' | 'reserve' = 'staff') => {
+    let path = slug;
+    let label = 'Link de Embarque (Equipe)';
+
+    if (type === 'passenger') {
+      path = `${slug}?modo=visualizar`;
+      label = 'Link do Passageiro (Visualização)';
+    } else if (type === 'reserve') {
+      path = `${slug}/reservar`;
+      label = 'Link de Reserva';
+    }
+
     const link = `${window.location.origin}/${path}`;
     navigator.clipboard.writeText(link);
-    alert(`${type === 'reserve' ? 'Link de Reserva' : 'Link do Mapa'} copiado!`);
+    alert(`${label} copiado com sucesso!`);
   };
 
   const handleUpdateTrip = async (updates: any) => {
@@ -212,31 +222,44 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                   <div className="flex flex-col gap-2 mt-auto">
-                    <div className="flex gap-2">
+                   <div className="flex flex-col gap-2.5 mt-auto pt-4 border-t border-zinc-800/80">
+                    <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={() => copyLink(trip.slug, 'map')}
-                        className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] font-bold hover:bg-zinc-800 flex items-center justify-center gap-2 transition-all"
+                        onClick={() => copyLink(trip.slug, 'staff')}
+                        className="bg-blue-600/10 border border-blue-500/30 text-blue-400 rounded-xl px-3 py-2.5 text-[10px] font-black hover:bg-blue-600/20 flex items-center justify-center gap-1.5 transition-all"
+                        title="Link com permissão para marcar embarque e editar"
                       >
-                        <ClipboardCopy className="w-3 h-3 text-zinc-500" />
-                        LINK MAPA
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        LINK EQUIPE
                       </button>
                       <button
-                        onClick={() => copyLink(trip.slug, 'reserve')}
-                        className="flex-1 bg-blue-600/10 border border-blue-600/30 text-blue-400 rounded-xl px-3 py-2 text-[10px] font-bold hover:bg-blue-600/20 flex items-center justify-center gap-2 transition-all"
+                        onClick={() => copyLink(trip.slug, 'passenger')}
+                        className="bg-zinc-950 border border-zinc-800 text-zinc-300 rounded-xl px-3 py-2.5 text-[10px] font-black hover:bg-zinc-800 flex items-center justify-center gap-1.5 transition-all"
+                        title="Link somente visualização para os passageiros"
                       >
-                        <ClipboardCopy className="w-3 h-3" />
-                        LINK RESERVA
+                        <Eye className="w-3.5 h-3.5 text-zinc-500" />
+                        LINK PASSAGEIRO
                       </button>
                     </div>
-                    <a
-                      href={`/${trip.slug}`}
-                      target="_blank"
-                      className="w-full bg-blue-600 rounded-xl px-3 py-2 text-xs font-bold hover:bg-blue-500 flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      ABRIR PAINEL DE EMBARQUE
-                    </a>
+
+                    <div className="flex gap-2">
+                      <a
+                        href={`/${trip.slug}`}
+                        target="_blank"
+                        className="flex-1 bg-blue-600 rounded-xl px-3 py-2.5 text-xs font-bold hover:bg-blue-500 flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        PAINEL EMBARQUE
+                      </a>
+                      <button
+                        onClick={() => copyLink(trip.slug, 'reserve')}
+                        className="bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-zinc-200 rounded-xl px-3 py-2.5 text-[10px] font-bold hover:bg-zinc-800 flex items-center justify-center gap-1.5 transition-all"
+                        title="Copiar Link de Reserva"
+                      >
+                        <ClipboardCopy className="w-3 h-3 text-zinc-500" />
+                        RESERVA
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
