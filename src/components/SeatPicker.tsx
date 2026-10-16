@@ -86,7 +86,7 @@ export function SeatPicker({
           <div className="w-20 h-1.5 bg-zinc-900 rounded-full" />
         </div>
 
-        <div className="grid grid-cols-[1fr_1fr_0.4fr_1fr_1fr] gap-y-4 items-center">
+        <div className="grid grid-cols-[1fr_1fr_0.35fr_1fr_1fr] gap-x-2 sm:gap-x-3 gap-y-4 items-center">
           {Array.from({ length: numRows }).map((_, rowIndex) => {
             const rowStart = rowIndex * 4;
             return (

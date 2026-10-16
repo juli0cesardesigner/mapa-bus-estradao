@@ -106,8 +106,8 @@ export function BusMap({
       </div>
 
       {/* Corpo do Ônibus - Grid Distribuído */}
-      <div className="w-full bg-[#0D0D0D] border-x border-zinc-900 p-6 relative">
-        <div className="grid grid-cols-[1fr_1fr_0.4fr_1fr_1fr] gap-y-6 items-center">
+      <div className="w-full bg-[#0D0D0D] border-x border-zinc-900 px-3 sm:px-6 py-6 relative">
+        <div className="grid grid-cols-[1fr_1fr_0.35fr_1fr_1fr] gap-x-2 sm:gap-x-3 gap-y-5 sm:gap-y-6 items-center">
           {Array.from({ length: numRows }).map((_, rowIndex) => {
             const rowStart = rowIndex * 4;
             return (
@@ -119,7 +119,7 @@ export function BusMap({
                   const p = passengerMap.get(seatNum);
                   const color = p ? (locationColors[p.localidade] || p.cor_hex || '#3B82F6') : undefined;
                   return (
-                    <div key={seatNum} className="flex justify-center">
+                    <div key={seatNum} className="flex justify-center w-full">
                       <Seat 
                         num={seatNum} 
                         passenger={p} 
@@ -142,7 +142,7 @@ export function BusMap({
                   const p = passengerMap.get(seatNum);
                   const color = p ? (locationColors[p.localidade] || p.cor_hex || '#3B82F6') : undefined;
                   return (
-                    <div key={seatNum} className="flex justify-center">
+                    <div key={seatNum} className="flex justify-center w-full">
                       <Seat 
                         num={seatNum} 
                         passenger={p} 
@@ -188,7 +188,7 @@ export function BusMap({
 function Seat({ num, passenger, color, onClick }: { num: number; passenger?: any; color?: string; onClick: () => void }) {
   if (!passenger) {
     return (
-      <div className="w-full max-w-[80px] h-16 bg-emerald-950/10 border border-emerald-900/30 rounded-xl flex flex-col items-center justify-center text-[10px] text-emerald-500/50 font-black transition-all opacity-70">
+      <div className="w-full sm:max-w-[76px] h-14 sm:h-16 bg-emerald-950/10 border border-emerald-900/30 rounded-xl flex flex-col items-center justify-center text-[10px] text-emerald-500/50 font-black transition-all opacity-70">
         {num}
       </div>
     );
@@ -201,7 +201,7 @@ function Seat({ num, passenger, color, onClick }: { num: number; passenger?: any
     <button
       onClick={onClick}
       className={cn(
-        "w-full max-w-[80px] h-16 rounded-xl flex flex-col items-center justify-center transition-all relative overflow-hidden group border-2",
+        "w-full sm:max-w-[76px] h-14 sm:h-16 rounded-xl flex flex-col items-center justify-center transition-all relative overflow-hidden group border-2",
         isBoarded 
           ? "bg-zinc-900/20 border-zinc-800 text-zinc-700" 
           : "text-white border-transparent shadow-2xl active:scale-95 hover:brightness-110"
