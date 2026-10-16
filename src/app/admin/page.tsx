@@ -106,14 +106,14 @@ export default function AdminPage() {
   };
 
   const copyLink = (slug: string, type: 'staff' | 'passenger' | 'reserve' = 'staff') => {
-    let path = slug;
+    let path = `${slug}/equipe`;
     let label = 'Link de Embarque (Equipe)';
 
     if (type === 'passenger') {
-      path = `${slug}?passageiro`;
+      path = `${slug}/passageiro`;
       label = 'Link do Passageiro';
     } else if (type === 'staff') {
-      path = `${slug}?equipe`;
+      path = `${slug}/equipe`;
       label = 'Link da Equipe';
     } else if (type === 'reserve') {
       path = `${slug}/reservar`;
