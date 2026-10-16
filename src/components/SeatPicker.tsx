@@ -35,8 +35,9 @@ export function SeatPicker({
   const [floor, setFloor] = useState<1 | 2>(2);
 
   // Definição de assentos por piso dinâmico
+  const inferiorStart = (assentos_superior || 0) + 1;
   const floor1Seats = tem_dois_andares 
-    ? Array.from({ length: assentos_inferior }, (_, i) => i + 51)
+    ? Array.from({ length: assentos_inferior }, (_, i) => i + inferiorStart)
     : [];
   const floor2Seats = Array.from(
     { length: tem_dois_andares ? assentos_superior : capacity }, 

@@ -48,8 +48,9 @@ export function BusMap({
   }, [passengers]);
 
   // Definição de assentos por piso dinâmico
+  const inferiorStart = (assentos_superior || 0) + 1;
   const floor1Seats = tem_dois_andares 
-    ? Array.from({ length: assentos_inferior }, (_, i) => i + 51) // Começa no 51 conforme padrão DD
+    ? Array.from({ length: assentos_inferior }, (_, i) => i + inferiorStart)
     : [];
   const floor2Seats = Array.from(
     { length: tem_dois_andares ? assentos_superior : capacity }, 

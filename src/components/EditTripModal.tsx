@@ -153,49 +153,77 @@ export const EditTripModal: React.FC<EditTripModalProps> = ({ trip, onClose, onS
             </div>
 
             {hasTwoFloors ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-zinc-800/60">
-                <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                    Piso Superior (1 até...)
-                  </label>
-                  <input
-                    type="number"
-                    value={superiorSeats}
-                    onChange={(e) => setSuperiorSeats(Math.max(1, parseInt(e.target.value) || 0))}
-                    className="w-full bg-zinc-900 border border-zinc-700/60 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                    min="1"
-                    max="80"
-                    required
-                  />
-                  <span className="text-[10px] text-zinc-500 mt-1 block">Assentos 1 a {superiorSeats}</span>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                    Piso Inferior (Qtd.)
-                  </label>
-                  <select
-                    value={inferiorSeats}
-                    onChange={(e) => setInferiorSeats(parseInt(e.target.value))}
-                    className="w-full bg-zinc-900 border border-zinc-700/60 rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
-                  >
-                    <option value={12}>12 lugares (51 a 62)</option>
-                    <option value={16}>16 lugares (51 a 66)</option>
-                    <option value={8}>8 lugares (51 a 58)</option>
-                    <option value={10}>10 lugares (51 a 60)</option>
-                    <option value={14}>14 lugares (51 a 64)</option>
-                  </select>
-                  <span className="text-[10px] text-zinc-500 mt-1 block">Começa no 51</span>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-zinc-400 mb-1.5">
-                    Capacidade Total
-                  </label>
-                  <div className="w-full bg-zinc-900/80 border border-zinc-800 rounded-xl px-3 py-2 text-sm font-bold text-blue-400 flex items-center justify-between">
-                    <span>{capacity} poltronas</span>
-                    <span className="text-[10px] text-zinc-500 font-normal">Auto</span>
+              <div className="space-y-4 pt-3 border-t border-zinc-800/60">
+                {/* Linha 1: Piso Superior */}
+                <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-white block">
+                        Piso Superior
+                      </span>
+                      <span className="text-[11px] text-zinc-400">
+                        Informe a poltrona final do piso superior (inicia na 01 até a poltrona informada):
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-zinc-500">01 até</span>
+                        <input
+                          type="number"
+                          value={superiorSeats}
+                          onChange={(e) => setSuperiorSeats(Math.max(1, parseInt(e.target.value) || 0))}
+                          className="w-24 bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-center font-bold text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                          min="1"
+                          max="100"
+                          required
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-2 rounded-xl whitespace-nowrap">
+                        Assentos: 01 a {String(superiorSeats).padStart(2, '0')}
+                      </span>
+                    </div>
                   </div>
+                </div>
+
+                {/* Linha 2: Piso Inferior */}
+                <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-white block">
+                        Piso Inferior
+                      </span>
+                      <span className="text-[11px] text-zinc-400">
+                        Quantidade de poltronas no piso inferior (iniciando automaticamente após a última do piso superior):
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-zinc-500">Qtd:</span>
+                        <input
+                          type="number"
+                          value={inferiorSeats}
+                          onChange={(e) => setInferiorSeats(Math.max(1, parseInt(e.target.value) || 0))}
+                          className="w-24 bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-center font-bold text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                          min="1"
+                          max="60"
+                          required
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl whitespace-nowrap">
+                        Assentos: {String(superiorSeats + 1).padStart(2, '0')} a {String(superiorSeats + inferiorSeats).padStart(2, '0')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Linha 3: Resumo Capacidade Total */}
+                <div className="flex items-center justify-between bg-zinc-950/70 border border-zinc-800 rounded-2xl px-5 py-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Capacidade Total do Ônibus (DD)
+                  </span>
+                  <span className="text-sm font-black text-blue-400">
+                    {capacity} poltronas ({superiorSeats} no superior + {inferiorSeats} no inferior)
+                  </span>
                 </div>
               </div>
             ) : (
